@@ -1,7 +1,7 @@
 {
   "name": "super-creation",
-  "version": "0.3.0",
-  "description": "Execute plans from start to ship — AI does 90%, you craft the 10% that matters.",
+  "version": "0.4.0",
+  "description": "Execute plans and produce multi-format content — code, audio, docs. AI does 90%, you craft the 10% that matters.",
   "author": {
     "name": "aibility",
     "url": "https://github.com/aibilitycz"
@@ -15,6 +15,10 @@
     "building",
     "work",
     "release-notes",
-    "continuous-delivery"
+    "continuous-delivery",
+    "elevenlabs",
+    "audio",
+    "podcast",
+    "tts"
   ]
 }
