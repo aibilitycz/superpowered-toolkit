@@ -95,6 +95,72 @@ tools: Read, Grep, Glob
 
 ---
 
+## Output Artifacts
+
+Skills produce artifacts in the consuming project (the repo where the toolkit is installed). These are the **default paths and naming conventions**. Projects can override them in their `CLAUDE.md`.
+
+### Default Paths
+
+| Artifact | Default Path | Produced By |
+|----------|-------------|-------------|
+| Brainstorms | `docs/brainstorms/` | `/brainstorm` |
+| Plans | `docs/plans/` | `/plan` |
+| Solutions | `docs/solutions/` | `/compound` |
+| Runbooks | `docs/operators/runbooks/` | `/work` (when creating ops docs) |
+| ADRs | `architecture/decisions/` | `/plan`, `/think` |
+| Handoffs | `docs/handoffs/` | `/orchestrate` |
+
+### File Naming
+
+All output artifacts follow the same pattern:
+
+```
+YYYY-MM-DD-{kebab-topic}-{type}.md
+```
+
+Examples:
+- `2026-03-08-scoring-trust-audit-explainability-brainstorm.md`
+- `2026-03-04-feat-l1-triplet-choice-assessment-plan.md`
+- `2026-02-20-sse-auth-token-refresh.md` (solutions omit the `-solution` suffix)
+
+### YAML Frontmatter (Output Artifacts)
+
+Every artifact file must include frontmatter:
+
+```yaml
+---
+title: "Human-readable title"
+type: brainstorm | plan | solution | runbook | adr | handoff
+date: YYYY-MM-DD
+status: draft | approved | in_progress | complete | shipped  # plans only
+participants: [who was involved]
+related:
+  - docs/brainstorms/YYYY-MM-DD-related-topic.md
+  - https://github.com/org/repo/issues/123
+---
+```
+
+**Required fields:** `title`, `type`, `date`
+**Optional fields:** `status`, `participants`, `related`, `tags`
+
+### Overriding Defaults
+
+Projects override output paths in their `CLAUDE.md`:
+
+```markdown
+## Toolkit Output Paths
+
+| Artifact | Path |
+|----------|------|
+| Brainstorms | `design/brainstorms/` |
+| Plans | `design/plans/` |
+| Solutions | `knowledge/solutions/` |
+```
+
+Skills check the project's `CLAUDE.md` for a "Toolkit Output Paths" table before using defaults. If the table exists, its paths take precedence.
+
+---
+
 ## Cross-References
 
 - **Between plugins:** Use relative paths from the plugin root: `../../METHODOLOGY.md`, `../psychometric-ai-toolkit/CLAUDE.md`
