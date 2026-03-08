@@ -1,10 +1,10 @@
 ---
 name: elevenlabs
 description: >
-  Generate audio content using the ElevenLabs Python SDK — text-to-speech, podcasts,
-  voice cloning, sound effects, speech-to-speech, dubbing, and audio isolation.
-  Use when the user wants to create audio files, generate podcasts from text,
-  clone voices, produce voiceovers, or work with ElevenLabs API.
+  Generate audio content using ElevenLabs — text-to-speech, podcasts, voice cloning,
+  sound effects, speech-to-speech, dubbing, and audio isolation. Works with both the
+  Python SDK and the ElevenLabs CLI. Includes ready-to-run generator scripts that
+  Claude writes to a temp file and executes directly.
   Triggers: elevenlabs, text-to-speech, TTS, podcast, voice, audio, voiceover,
   narration, voice clone, sound effects, dubbing, speech-to-speech, audio isolation.
 allowed-tools:
@@ -18,261 +18,301 @@ allowed-tools:
 
 # ElevenLabs Audio Production
 
-Generate audio content with the ElevenLabs Python SDK — from single-line TTS to full podcast production.
+Generate audio with ElevenLabs — from single-line TTS to multi-voice podcasts. This skill
+includes ready-to-run Python scripts. Claude writes them to a temp file and executes directly.
 
 ## Boundaries
 
-**This skill MAY:** install the SDK, generate audio files, list voices, create voice clones, write audio generation scripts, play audio, manage projects.
+**This skill MAY:** install the SDK, generate audio files, list voices, create voice clones, write and execute generation scripts, play audio.
 
-**This skill MAY NOT:** store API keys in code (use env vars or secrets), commit audio files to git (use `.gitignore`), generate audio without user approval of the text/script first.
+**This skill MAY NOT:** store API keys in code (use env vars or `~/.elevenlabs/api_key`), commit audio files to git, generate audio without user approval of the script first.
 
 ## Common Rationalizations
 
 | Shortcut | Why It Fails | The Cost |
 |----------|-------------|----------|
-| Hardcode API key in script | Leaks credentials to git history | Security incident, key rotation |
-| Skip voice selection, use default | Default voice may not match content tone | Re-generation wastes credits |
-| Generate full podcast without preview | Long audio = expensive; mistakes compound | Wasted API credits, re-work |
-| Use `eleven_v3` for everything | Wrong model for long-form (char limit 5,000) | Truncated audio, extra API calls |
-| Skip `output_format` parameter | Default mp3 may not match downstream needs | Format conversion overhead |
+| Hardcode API key in script | Leaks credentials to git history | Security incident |
+| Skip voice selection | Default voice may not match content tone | Wasted credits on re-gen |
+| Generate full podcast without preview | Long audio = expensive; mistakes compound | Non-refundable credits |
+| Use `eleven_v3` for everything | 5,000 char limit — wrong for long-form | Truncated audio |
+| Import pydub for concatenation | Broken on Python 3.13+ (audioop removed) | Runtime crash |
 
-## Prerequisites
-
-```bash
-# Install SDK
-pip install elevenlabs
-
-# Or with uv (preferred in aimee-backend)
-uv pip install elevenlabs
-
-# Set API key (NEVER hardcode)
-export ELEVENLABS_API_KEY="your-key-here"
-```
-
-Verify setup:
-```python
-from elevenlabs.client import ElevenLabs
-client = ElevenLabs()  # reads ELEVENLABS_API_KEY from env
-voices = client.voices.get_all()
-print(f"Connected. {len(voices.voices)} voices available.")
-```
-
-## Phase 0: Understand the Request
+## Phase 0: Environment Setup
 
 **Entry:** User wants audio content.
 
-Classify the request:
+### Step 1: Detect Authentication
 
-| Request Type | Route | Model Recommendation |
-|-------------|-------|---------------------|
-| Short TTS (< 1,000 chars) | Phase 1: Quick TTS | `eleven_flash_v2_5` (fast, cheap) |
-| Medium TTS (1,000-5,000 chars) | Phase 1: Quick TTS | `eleven_v3` (expressive) |
-| Long-form / podcast (> 5,000 chars) | Phase 2: Podcast | `eleven_multilingual_v2` (stable, 10k limit) |
-| Voice cloning | Phase 3: Voice Clone | N/A |
-| Sound effects | Phase 4: Sound Effects | N/A |
-| Speech-to-speech | Phase 5: Voice Transform | `eleven_english_sts_v2` |
-| Audio cleanup | Phase 6: Audio Isolation | N/A |
-| Dubbing / translation | Phase 7: Dubbing | N/A |
+Check in order — use the first one found:
 
-**Exit:** Request classified, user approves the approach.
+```bash
+# 1. Check CLI auth (preferred — already logged in)
+elevenlabs auth whoami --no-ui 2>/dev/null
 
-## Phase 1: Quick Text-to-Speech
+# 2. Check env var
+echo "${ELEVENLABS_API_KEY:+set}"
 
-**Entry:** User wants a single audio file from text.
-
-### Step 1: Select Voice
-
-```python
-from elevenlabs.client import ElevenLabs
-
-client = ElevenLabs()
-
-# List available voices
-voices = client.voices.get_all()
-for v in voices.voices:
-    print(f"{v.voice_id}: {v.name} ({v.labels})")
+# 3. Check stored key file
+cat ~/.elevenlabs/api_key 2>/dev/null | head -c 10
 ```
 
-**Popular built-in voices:**
-
-| Voice | ID | Style | Good For |
-|-------|-----|-------|----------|
-| Rachel | `21m00Tcm4TlvDq8ikWAM` | Calm, narration | Podcasts, audiobooks |
-| Adam | `pNInz6obpgDQGcFmaJgB` | Deep, authoritative | Business, explainers |
-| Bella | `EXAVITQu4vr4xnSDxMaL` | Warm, friendly | Casual content |
-| Antoni | `ErXwobaYiN019PkySvjV` | Conversational | Dialogue, interviews |
-| Elli | `MF3mGyEYCl7XYWbV9V6O` | Young, energetic | Marketing, tutorials |
-
-### Step 2: Generate
+**API key resolution in Python** (use this in ALL scripts):
 
 ```python
 import os
 
-audio = client.text_to_speech.convert(
-    text="Your text here",
-    voice_id="21m00Tcm4TlvDq8ikWAM",
-    model_id="eleven_multilingual_v2",
-    output_format="mp3_44100_128",
-)
-
-output_path = "output.mp3"
-with open(output_path, "wb") as f:
-    f.write(audio)
-
-print(f"Saved to {output_path} ({os.path.getsize(output_path)} bytes)")
+def get_api_key() -> str:
+    """Resolve ElevenLabs API key from CLI store, env var, or fail."""
+    # 1. CLI stored key
+    key_file = os.path.expanduser("~/.elevenlabs/api_key")
+    if os.path.exists(key_file):
+        return open(key_file).read().strip()
+    # 2. Environment variable
+    key = os.environ.get("ELEVENLABS_API_KEY", "")
+    if key:
+        return key
+    raise RuntimeError(
+        "No ElevenLabs API key found. Run `elevenlabs auth login` or "
+        "set ELEVENLABS_API_KEY environment variable."
+    )
 ```
 
-### Step 3: Stream (for real-time playback)
+### Step 2: Install SDK (if needed)
+
+```bash
+# Check if installed
+python3 -c "import elevenlabs" 2>/dev/null || uv pip install --system --break-system-packages elevenlabs
+```
+
+**IMPORTANT:** Do NOT install pydub. It's broken on Python 3.13+ (audioop removed). The scripts
+below use raw MP3 byte concatenation instead — MP3 is a frame-based format and files can be
+concatenated directly.
+
+### Step 3: Verify Connection
+
+```bash
+python3 -c "
+from elevenlabs.client import ElevenLabs
+import os
+
+key_file = os.path.expanduser('~/.elevenlabs/api_key')
+api_key = open(key_file).read().strip() if os.path.exists(key_file) else os.environ.get('ELEVENLABS_API_KEY', '')
+client = ElevenLabs(api_key=api_key)
+voices = client.voices.get_all()
+print(f'Connected. {len(voices.voices)} voices available.')
+for v in voices.voices[:10]:
+    labels = dict(v.labels) if v.labels else {}
+    print(f'  {v.voice_id} | {v.name:25s} | {labels.get(\"accent\", \"\")} {labels.get(\"gender\", \"\")}')
+"
+```
+
+**Exit:** Auth verified, SDK installed, voices listed.
+
+## Phase 1: Quick Text-to-Speech
+
+**Entry:** User wants a single audio file from text (< 10,000 chars).
+
+Write this script to a temp file and execute:
 
 ```python
-from elevenlabs import stream as play_stream
+#!/usr/bin/env python3
+"""ElevenLabs TTS generator."""
+import os
+from elevenlabs.client import ElevenLabs
 
-audio_stream = client.text_to_speech.convert_as_stream(
-    text="Your text here",
-    voice_id="21m00Tcm4TlvDq8ikWAM",
-    model_id="eleven_flash_v2_5",
+# --- CONFIG (Claude fills these) ---
+TEXT = """Your text here."""
+VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"          # George - Warm Storyteller
+MODEL_ID = "eleven_multilingual_v2"           # See model table below
+OUTPUT_FORMAT = "mp3_44100_128"
+OUTPUT_PATH = "output.mp3"
+# --- END CONFIG ---
+
+key_file = os.path.expanduser("~/.elevenlabs/api_key")
+api_key = open(key_file).read().strip() if os.path.exists(key_file) else os.environ["ELEVENLABS_API_KEY"]
+client = ElevenLabs(api_key=api_key)
+
+print(f"Generating {len(TEXT)} chars with {MODEL_ID}...")
+audio = client.text_to_speech.convert(
+    text=TEXT,
+    voice_id=VOICE_ID,
+    model_id=MODEL_ID,
+    output_format=OUTPUT_FORMAT,
 )
 
-play_stream(audio_stream)  # Plays immediately as it generates
+with open(OUTPUT_PATH, "wb") as f:
+    f.write(audio)
+
+size_kb = os.path.getsize(OUTPUT_PATH) / 1024
+print(f"Saved to {OUTPUT_PATH} ({size_kb:.0f} KB)")
 ```
 
-**Exit:** Audio file saved or streamed.
+**Exit:** Audio file saved, size reported.
 
 ## Phase 2: Podcast / Long-Form Audio
 
-**Entry:** User wants podcast-style audio from a long text (> 5,000 chars).
+**Entry:** User wants podcast-style audio (single or multi-voice).
 
-### Strategy: Chunk and Concatenate
+This is the main generator. Write it to a temp file, fill in the CONFIG section, execute.
 
-ElevenLabs models have character limits. For long content, split into semantic chunks and concatenate.
+**IMPORTANT:** Uses raw MP3 byte concatenation (no pydub). For pauses between segments,
+generates a short silent audio clip via the API once and reuses it.
 
-```python
-import io
-from pydub import AudioSegment  # pip install pydub
-
-def generate_podcast(
-    client,
-    script: str,
-    voice_id: str,
-    model_id: str = "eleven_multilingual_v2",
-    chunk_size: int = 4500,
-    output_path: str = "podcast.mp3",
-    pause_ms: int = 800,
-) -> str:
-    """Generate podcast audio from a long script.
-
-    Splits on paragraph boundaries, generates per-chunk,
-    concatenates with pauses between sections.
-    """
-    # Split on double newlines (paragraph boundaries)
-    paragraphs = [p.strip() for p in script.split("\n\n") if p.strip()]
-
-    # Group paragraphs into chunks under the char limit
-    chunks = []
-    current_chunk = ""
-    for para in paragraphs:
-        if len(current_chunk) + len(para) + 2 > chunk_size:
-            if current_chunk:
-                chunks.append(current_chunk)
-            current_chunk = para
-        else:
-            current_chunk = f"{current_chunk}\n\n{para}" if current_chunk else para
-    if current_chunk:
-        chunks.append(current_chunk)
-
-    print(f"Split into {len(chunks)} chunks")
-
-    # Generate audio for each chunk
-    pause = AudioSegment.silent(duration=pause_ms)
-    combined = AudioSegment.empty()
-
-    for i, chunk in enumerate(chunks):
-        print(f"Generating chunk {i + 1}/{len(chunks)} ({len(chunk)} chars)...")
-        audio_bytes = client.text_to_speech.convert(
-            text=chunk,
-            voice_id=voice_id,
-            model_id=model_id,
-            output_format="mp3_44100_128",
-            previous_text=chunks[i - 1][-200:] if i > 0 else None,
-        )
-        segment = AudioSegment.from_mp3(io.BytesIO(audio_bytes))
-        combined += segment + pause
-
-    combined.export(output_path, format="mp3", bitrate="128k")
-    duration_s = len(combined) / 1000
-    print(f"Saved {output_path} ({duration_s:.0f}s, {duration_s / 60:.1f} min)")
-    return output_path
-```
-
-### Usage
+### Single-Voice Podcast
 
 ```python
+#!/usr/bin/env python3
+"""ElevenLabs single-voice podcast generator.
+
+Splits long text on paragraph boundaries, generates per-chunk with
+previous_text continuity, concatenates MP3 bytes directly.
+"""
+import os
 from elevenlabs.client import ElevenLabs
 
-client = ElevenLabs()
+# --- CONFIG ---
+SCRIPT = """
+Your podcast script here.
 
-script = open("podcast_script.md").read()
+Split into paragraphs with blank lines.
 
-generate_podcast(
-    client,
-    script=script,
-    voice_id="21m00Tcm4TlvDq8ikWAM",  # Rachel
-    output_path="sp-assessment-explained.mp3",
+Each paragraph becomes natural speech.
+"""
+VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"          # George - Warm Storyteller
+MODEL_ID = "eleven_multilingual_v2"
+OUTPUT_PATH = "podcast.mp3"
+CHUNK_SIZE = 4500                             # chars per API call (leave margin under 5k/10k limit)
+# --- END CONFIG ---
+
+key_file = os.path.expanduser("~/.elevenlabs/api_key")
+api_key = open(key_file).read().strip() if os.path.exists(key_file) else os.environ["ELEVENLABS_API_KEY"]
+client = ElevenLabs(api_key=api_key)
+
+# Split on paragraph boundaries
+paragraphs = [p.strip() for p in SCRIPT.strip().split("\n\n") if p.strip()]
+chunks, current = [], ""
+for para in paragraphs:
+    if len(current) + len(para) + 2 > CHUNK_SIZE:
+        if current:
+            chunks.append(current)
+        current = para
+    else:
+        current = f"{current}\n\n{para}" if current else para
+if current:
+    chunks.append(current)
+
+print(f"Script: {len(SCRIPT)} chars -> {len(chunks)} chunks")
+
+# Generate silence for pauses (one short phrase, reuse the bytes)
+silence = client.text_to_speech.convert(
+    text="...",
+    voice_id=VOICE_ID,
+    model_id=MODEL_ID,
+    output_format="mp3_44100_128",
 )
+
+# Generate and concatenate
+audio_parts = []
+for i, chunk in enumerate(chunks):
+    print(f"  [{i+1}/{len(chunks)}] {len(chunk)} chars: {chunk[:50]}...")
+    audio_bytes = client.text_to_speech.convert(
+        text=chunk,
+        voice_id=VOICE_ID,
+        model_id=MODEL_ID,
+        output_format="mp3_44100_128",
+        previous_text=chunks[i - 1][-200:] if i > 0 else None,
+    )
+    audio_parts.append(audio_bytes)
+    if i < len(chunks) - 1:
+        audio_parts.append(silence)
+
+with open(OUTPUT_PATH, "wb") as f:
+    for part in audio_parts:
+        f.write(part)
+
+size_mb = os.path.getsize(OUTPUT_PATH) / (1024 * 1024)
+print(f"\nSaved to {OUTPUT_PATH} ({size_mb:.1f} MB)")
 ```
 
 ### Multi-Voice Podcast (Dialogue)
 
-For interview/conversation format with multiple speakers:
-
 ```python
-def generate_dialogue_podcast(
-    client,
-    segments: list[dict],
-    output_path: str = "dialogue.mp3",
-    pause_ms: int = 600,
-) -> str:
-    """Generate multi-voice podcast.
+#!/usr/bin/env python3
+"""ElevenLabs multi-voice podcast generator.
 
-    segments: [{"voice_id": "...", "text": "..."}, ...]
-    """
-    from pydub import AudioSegment
-    import io
+Each segment has a voice_id and text. Generates per-segment,
+concatenates MP3 bytes with silence pauses between speakers.
+"""
+import os
+from elevenlabs.client import ElevenLabs
 
-    pause = AudioSegment.silent(duration=pause_ms)
-    combined = AudioSegment.empty()
-
-    for i, seg in enumerate(segments):
-        print(f"Segment {i + 1}/{len(segments)}: {seg['text'][:50]}...")
-        audio_bytes = client.text_to_speech.convert(
-            text=seg["text"],
-            voice_id=seg["voice_id"],
-            model_id="eleven_multilingual_v2",
-            output_format="mp3_44100_128",
-        )
-        combined += AudioSegment.from_mp3(io.BytesIO(audio_bytes)) + pause
-
-    combined.export(output_path, format="mp3", bitrate="128k")
-    print(f"Saved {output_path} ({len(combined) / 1000:.0f}s)")
-    return output_path
-
-
-# Example: two-host podcast
-segments = [
-    {"voice_id": "pNInz6obpgDQGcFmaJgB", "text": "Welcome to the show. Today we're talking about AI assessment."},
-    {"voice_id": "21m00Tcm4TlvDq8ikWAM", "text": "Thanks for having me. Let's dive in."},
-    {"voice_id": "pNInz6obpgDQGcFmaJgB", "text": "So how does this whole thing actually work?"},
-    # ...
+# --- CONFIG ---
+SEGMENTS = [
+    # (voice_id, text)
+    # George - Warm Storyteller (host)
+    ("JBFqnCBsd6RMkjVDRZzb", "Welcome to the show. Today we're talking about..."),
+    # Alice - Clear Educator (co-host)
+    ("Xb7hH8MSUJpSdBMzjjln", "Thanks for having me. Let's dive into the science."),
+    ("JBFqnCBsd6RMkjVDRZzb", "So how does this actually work?"),
+    ("Xb7hH8MSUJpSdBMzjjln", "Great question. It starts with..."),
 ]
+MODEL_ID = "eleven_multilingual_v2"
+OUTPUT_PATH = "dialogue-podcast.mp3"
+# --- END CONFIG ---
 
-generate_dialogue_podcast(client, segments)
+# Voice name lookup for logging
+VOICE_NAMES = {}
+
+key_file = os.path.expanduser("~/.elevenlabs/api_key")
+api_key = open(key_file).read().strip() if os.path.exists(key_file) else os.environ["ELEVENLABS_API_KEY"]
+client = ElevenLabs(api_key=api_key)
+
+# Resolve voice names for logging
+try:
+    voices = client.voices.get_all()
+    VOICE_NAMES = {v.voice_id: v.name for v in voices.voices}
+except Exception:
+    pass
+
+# Generate silence for pauses
+silence = client.text_to_speech.convert(
+    text="...",
+    voice_id=SEGMENTS[0][0],
+    model_id=MODEL_ID,
+    output_format="mp3_44100_128",
+)
+
+print(f"Generating {len(SEGMENTS)} segments...")
+
+audio_parts = []
+for i, (voice_id, text) in enumerate(SEGMENTS):
+    name = VOICE_NAMES.get(voice_id, voice_id[:12])
+    preview = text[:60].replace("\n", " ")
+    print(f"  [{i+1}/{len(SEGMENTS)}] {name}: {preview}...")
+
+    audio_bytes = client.text_to_speech.convert(
+        text=text,
+        voice_id=voice_id,
+        model_id=MODEL_ID,
+        output_format="mp3_44100_128",
+    )
+    audio_parts.append(audio_bytes)
+    if i < len(SEGMENTS) - 1:
+        audio_parts.append(silence)
+
+with open(OUTPUT_PATH, "wb") as f:
+    for part in audio_parts:
+        f.write(part)
+
+size_mb = os.path.getsize(OUTPUT_PATH) / (1024 * 1024)
+print(f"\nSaved to {OUTPUT_PATH} ({size_mb:.1f} MB)")
 ```
 
 **Exit:** Podcast audio file saved.
 
 ## Phase 3: Voice Cloning
 
-**Entry:** User wants to create a custom voice from audio samples.
+**Entry:** User wants a custom voice from audio samples.
 
 ### Instant Voice Clone (1-5 min of audio)
 
@@ -282,28 +322,15 @@ voice = client.clone(
     description="Professional male, mid-30s, neutral accent",
     files=["sample1.mp3", "sample2.mp3"],
 )
-
 print(f"Cloned voice ID: {voice.voice_id}")
-
-# Use it immediately
-audio = client.text_to_speech.convert(
-    text="Testing my cloned voice.",
-    voice_id=voice.voice_id,
-    model_id="eleven_multilingual_v2",
-)
 ```
 
 ### Voice Design (Generate New Voice)
 
 ```python
-from elevenlabs.client import ElevenLabs
-
-client = ElevenLabs()
-
-# Generate a brand-new voice from attributes
 audio = client.text_to_speech.convert(
-    text="This is a test of a designed voice.",
-    voice_id="custom",  # Use voice design endpoint
+    text="Testing a designed voice.",
+    voice_id="custom",
     model_id="eleven_multilingual_v2",
 )
 ```
@@ -311,8 +338,6 @@ audio = client.text_to_speech.convert(
 **Exit:** Custom voice created and tested.
 
 ## Phase 4: Sound Effects
-
-**Entry:** User wants AI-generated sound effects.
 
 ```python
 audio = client.text_to_sound_effects.convert(
@@ -324,16 +349,9 @@ with open("rain.mp3", "wb") as f:
     f.write(audio)
 ```
 
-**Prompting tips:**
-- Be specific: "footsteps on gravel" beats "walking sounds"
-- Include environment: "in a large cathedral" adds reverb
-- Specify duration for predictable results
-
-**Exit:** Sound effect file saved.
+Tips: be specific ("footsteps on gravel" > "walking sounds"), include environment ("in a cathedral"), specify duration.
 
 ## Phase 5: Speech-to-Speech (Voice Transform)
-
-**Entry:** User wants to transform audio from one voice to another.
 
 ```python
 with open("input.mp3", "rb") as f:
@@ -349,13 +367,9 @@ with open("transformed.mp3", "wb") as f:
     f.write(transformed)
 ```
 
-Preserves: timing, emotion, pacing. Changes: voice identity.
-
-**Exit:** Transformed audio file saved.
+Preserves timing, emotion, pacing. Changes voice identity.
 
 ## Phase 6: Audio Isolation (Noise Removal)
-
-**Entry:** User wants to clean up noisy audio.
 
 ```python
 with open("noisy.mp3", "rb") as f:
@@ -367,26 +381,15 @@ with open("clean.mp3", "wb") as f:
     f.write(clean)
 ```
 
-**Exit:** Cleaned audio file saved.
-
 ## Phase 7: Dubbing / Translation
 
-**Entry:** User wants to dub audio/video into another language.
-
 ```python
-from elevenlabs.client import ElevenLabs
-
-client = ElevenLabs()
-
-# From file
 result = client.dubbing.dub_a_video_or_an_audio_file(
     file=open("video.mp4", "rb"),
     target_lang="es",
     source_lang="en",
 )
-
 dubbing_id = result.dubbing_id
-print(f"Dubbing job: {dubbing_id}")
 
 # Poll for completion
 import time
@@ -397,72 +400,77 @@ while True:
     print(f"Status: {status.status}...")
     time.sleep(10)
 
-# Download result
 dubbed = client.dubbing.get_dubbed_file(dubbing_id, target_lang="es")
 with open("dubbed_es.mp4", "wb") as f:
     f.write(dubbed)
 ```
 
-**Exit:** Dubbed file saved.
+## CLI Quick Reference
 
-## Model Selection Reference
+When the ElevenLabs CLI (`elevenlabs`) is installed and authenticated:
 
-| Model ID | Best For | Char Limit | Latency | Languages |
-|----------|----------|------------|---------|-----------|
-| `eleven_v3` | Expressive, dramatic delivery | 5,000 | ~300ms | 70+ |
-| `eleven_multilingual_v2` | Long-form, stable, multilingual | 10,000 | Standard | 29 |
-| `eleven_flash_v2_5` | Low-latency, real-time | 40,000 | ~75ms | 32 |
-| `eleven_turbo_v2_5` | Quality + speed balance | 40,000 | ~250ms | 32 |
+```bash
+# Auth
+elevenlabs auth login              # Interactive API key setup
+elevenlabs auth whoami --no-ui     # Check status
+elevenlabs auth logout             # Remove stored key
 
-**Decision tree:**
+# Agents (conversational AI)
+elevenlabs agents init             # Init project
+elevenlabs agents add "My Agent"   # Create agent
+elevenlabs agents push             # Deploy to ElevenLabs
+elevenlabs agents list --no-ui     # List agents
+
+# The CLI is focused on agent management, NOT TTS.
+# For TTS/podcast/audio generation, use the Python SDK (this skill).
+```
+
+## Model Selection
+
+| Model ID | Best For | Char Limit | Latency | Languages | Cost |
+|----------|----------|------------|---------|-----------|------|
+| `eleven_v3` | Dramatic, expressive | 5,000 | ~300ms | 70+ | Standard |
+| `eleven_multilingual_v2` | Long-form, stable | 10,000 | Standard | 29 | Standard |
+| `eleven_flash_v2_5` | Ultra-low latency | 40,000 | ~75ms | 32 | 50% cheaper |
+| `eleven_turbo_v2_5` | Quality + speed | 40,000 | ~250ms | 32 | Standard |
 
 ```
 Need < 75ms latency?
 ├─ Yes → eleven_flash_v2_5
-└─ No → Is content > 5,000 chars?
+└─ No → Content > 5,000 chars?
    ├─ Yes → eleven_multilingual_v2
-   └─ No → Need dramatic/emotional delivery?
+   └─ No → Need dramatic delivery?
       ├─ Yes → eleven_v3
       └─ No → eleven_turbo_v2_5
 ```
 
-## Output Formats Reference
+## Voice Settings
 
-| Format String | Quality | Use Case |
-|--------------|---------|----------|
-| `mp3_44100_128` | High | Default, general purpose |
-| `mp3_44100_192` | Highest MP3 | Archival, high-fidelity |
-| `mp3_22050_32` | Low | Voice messages, previews |
-| `pcm_44100` | Lossless | Post-processing, editing |
-| `pcm_16000` | Low-latency | Real-time applications |
-
-## Voice Settings Tuning
+| Preset | Stability | Similarity | Use Case |
+|--------|-----------|------------|----------|
+| Stable narration | 0.8 | 0.75 | Podcasts, audiobooks |
+| Expressive | 0.3 | 0.85 | Dramatic reading |
+| Balanced | 0.5 | 0.5 | General purpose |
 
 ```python
 from elevenlabs import VoiceSettings
 
-# Stable narration (audiobook, podcast)
-stable = VoiceSettings(stability=0.8, similarity_boost=0.75)
-
-# Expressive performance (dramatic reading)
-expressive = VoiceSettings(stability=0.3, similarity_boost=0.85)
-
-# Balanced (general purpose)
-balanced = VoiceSettings(stability=0.5, similarity_boost=0.5)
-
-# Use in generation
 audio = client.text_to_speech.convert(
     text="...",
     voice_id="...",
     model_id="eleven_multilingual_v2",
-    voice_settings=stable,
+    voice_settings=VoiceSettings(stability=0.8, similarity_boost=0.75),
 )
 ```
 
-| Parameter | Low (0.0-0.3) | Mid (0.4-0.6) | High (0.7-1.0) |
-|-----------|---------------|---------------|-----------------|
-| **Stability** | Varied, emotional | Balanced | Consistent, monotone |
-| **Similarity Boost** | More variation | Balanced | Closer to original voice |
+## Output Formats
+
+| Format | Quality | Use Case |
+|--------|---------|----------|
+| `mp3_44100_128` | High | Default, general purpose |
+| `mp3_44100_192` | Highest MP3 | Archival |
+| `mp3_22050_32` | Low | Previews |
+| `pcm_44100` | Lossless | Post-processing |
 
 ## Error Handling
 
@@ -473,7 +481,7 @@ try:
     audio = client.text_to_speech.convert(...)
 except ApiError as e:
     if e.status_code == 401:
-        print("Bad API key. Check ELEVENLABS_API_KEY env var.")
+        print("Bad API key. Run: elevenlabs auth login")
     elif e.status_code == 429:
         print("Rate limited. Wait and retry.")
     elif e.status_code == 422:
@@ -484,22 +492,20 @@ except ApiError as e:
 
 ## Cost Awareness
 
-- Characters are the billing unit. Every API call costs characters.
-- **Preview short clips first** before generating long content.
-- **Cache generated audio** — don't regenerate the same text.
-- `eleven_flash_v2_5` is 50% cheaper than other models.
-- Check usage: ElevenLabs dashboard or API subscription endpoint.
+- Characters are the billing unit — every API call costs characters
+- **Preview short clips first** before generating long content
+- **Cache generated audio** — don't regenerate the same text
+- `eleven_flash_v2_5` is 50% cheaper than other models
+- The silence-for-pauses trick costs ~3 characters per pause ("...")
 
 ## Validate
 
-Before delivering audio to the user:
-
-- [ ] API key loaded from environment, never hardcoded
-- [ ] Model selected matches content length and use case
+- [ ] API key loaded from `~/.elevenlabs/api_key` or env var, never hardcoded
+- [ ] Model selected matches content length (see model table)
 - [ ] Voice selected and approved by user before generation
 - [ ] For podcasts: script reviewed before generation (credits are non-refundable)
 - [ ] Output format matches downstream requirements
-- [ ] Audio file saved to a sensible location (not inside git-tracked source)
+- [ ] Audio file saved outside git-tracked directories
 - [ ] File size and duration reported to user
 
 ## What Makes This Superpowered
