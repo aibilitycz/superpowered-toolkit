@@ -1,0 +1,23 @@
+{
+  "name": "super-knowledge",
+  "version": "0.1.0",
+  "description": "Knowledge compounding, context engineering, and expert psychometric knowledge — learn by doing, never forget.",
+  "author": {
+    "name": "aibility",
+    "url": "https://github.com/aibilitycz"
+  },
+  "homepage": "https://github.com/aibilitycz/superpowered-toolkit/tree/main/plugins/super-knowledge",
+  "repository": "https://github.com/aibilitycz/superpowered-toolkit",
+  "license": "MIT",
+  "keywords": [
+    "knowledge-management",
+    "context-engineering",
+    "knowledge-compounding",
+    "psychometrics",
+    "assessment",
+    "irt",
+    "scoring",
+    "measurement",
+    "documentation"
+  ]
+}

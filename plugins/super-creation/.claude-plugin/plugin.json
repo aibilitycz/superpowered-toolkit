@@ -1,0 +1,20 @@
+{
+  "name": "super-creation",
+  "version": "0.1.0",
+  "description": "Execute plans, ship features, and build at speed — AI does 90%, you craft the 10% that matters.",
+  "author": {
+    "name": "aibility",
+    "url": "https://github.com/aibilitycz"
+  },
+  "homepage": "https://github.com/aibilitycz/superpowered-toolkit/tree/main/plugins/super-creation",
+  "repository": "https://github.com/aibilitycz/superpowered-toolkit",
+  "license": "MIT",
+  "keywords": [
+    "execution",
+    "shipping",
+    "building",
+    "work",
+    "release-notes",
+    "continuous-delivery"
+  ]
+}

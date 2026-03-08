@@ -1,0 +1,20 @@
+{
+  "name": "super-integration",
+  "version": "0.1.0",
+  "description": "Cross-plugin workflow orchestration — brainstorm to plan to work to review to compound, conducted.",
+  "author": {
+    "name": "aibility",
+    "url": "https://github.com/aibilitycz"
+  },
+  "homepage": "https://github.com/aibilitycz/superpowered-toolkit/tree/main/plugins/super-integration",
+  "repository": "https://github.com/aibilitycz/superpowered-toolkit",
+  "license": "MIT",
+  "keywords": [
+    "orchestration",
+    "workflow",
+    "integration",
+    "cross-plugin",
+    "collaboration",
+    "automation"
+  ]
+}

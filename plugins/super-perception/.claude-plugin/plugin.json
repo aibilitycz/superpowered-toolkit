@@ -1,0 +1,20 @@
+{
+  "name": "super-perception",
+  "version": "0.1.0",
+  "description": "Discovery, brainstorming, and problem reframing — see what others miss before building.",
+  "author": {
+    "name": "aibility",
+    "url": "https://github.com/aibilitycz"
+  },
+  "homepage": "https://github.com/aibilitycz/superpowered-toolkit/tree/main/plugins/super-perception",
+  "repository": "https://github.com/aibilitycz/superpowered-toolkit",
+  "license": "MIT",
+  "keywords": [
+    "brainstorming",
+    "discovery",
+    "research",
+    "problem-reframing",
+    "ideation",
+    "exploration"
+  ]
+}
