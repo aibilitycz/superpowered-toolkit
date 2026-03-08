@@ -2,6 +2,8 @@
 
 Expert-level psychometric knowledge for AI-assisted assessment development. All guidance grounded in peer-reviewed research.
 
+**Methodology Anchor:** MEASURE layer — serves all 5 Superpowers (Perception, Intelligence, Knowledge, Creation, Integration). Provides the measurement science that underpins dimension scores, composite weights, and assessment decisions. See `../../METHODOLOGY.md`.
+
 ## Core Principles
 
 1. **Measurement before technology.** Psychometric validity comes first. AI is a delivery mechanism, not a substitute for sound measurement science.

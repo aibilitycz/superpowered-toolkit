@@ -66,6 +66,15 @@ See `examples/` for walkthroughs:
 - **Design an MFC instrument** — "Design a 12-block forced-choice instrument"
 - **Validate an LLM scorer** — "My LLM scorer has low inter-rater agreement"
 
+## Methodology Anchor
+
+- **Layer:** MEASURE
+- **Superpowers served:** All 5 (measurement science is cross-cutting)
+- **Methodology components:** L1 scoring, L2 scoring, item calibration, reliability, validity, fairness
+- **Why this belongs:** You cannot assess the 5 superpowers without psychometrically sound measurement. This plugin provides the science that underpins every dimension score, every composite weight, and every assessment decision.
+
+See [METHODOLOGY.md](../../METHODOLOGY.md) for the full meta-framework.
+
 ## Disclaimer
 
 This toolkit provides guidance based on published psychometric research, not certification. For high-stakes assessment decisions (hiring, certification, clinical diagnosis), verify recommendations with a qualified psychometrician.
