@@ -55,6 +55,7 @@ Did you just complete a logical unit?
 | Skill | Command | Purpose |
 |-------|---------|---------|
 | [Work](skills/work/SKILL.md) | `/work` | Execute a plan from start to ship — implement, test, commit, quality checks, release notes, push |
+| [ElevenLabs](skills/elevenlabs/SKILL.md) | `/elevenlabs` | Generate audio — TTS, podcasts, voice cloning, sound effects, dubbing, audio isolation |
 
 ## Knowledge
 
