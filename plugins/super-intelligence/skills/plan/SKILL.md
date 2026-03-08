@@ -19,9 +19,21 @@ allowed-tools:
 
 Strategic planning that fits the problem. Simple features get concise plans. Complex work gets detailed plans with alternatives, risks, and phased implementation. Every plan explains WHY — not just WHAT.
 
+## Common Rationalizations
+
+| Shortcut | Why It Fails | The Cost |
+|----------|-------------|----------|
+| "Skip research — I already know the codebase" | You know YOUR mental model. The codebase may have changed, or patterns you haven't seen. | Plan conflicts with existing code → rework |
+| "Skip decision rationale — the approach is obvious" | Obvious to you, now. Not to the person executing in 2 weeks, or to future-you debugging. | Decisions get questioned, re-litigated, or silently reversed |
+| "Make every task detailed — more detail is better" | Over-specified plans are brittle. They break on first contact with reality. | Plan becomes a constraint instead of a guide |
+| "Skip risk analysis — it's low risk" | The risks you don't name are the ones that surprise you | Unmitigated risk → emergency debugging |
+
 ## Workflow
 
 ### 1. Detect Context
+
+**Entry:** User has a topic, brainstorm path, or feature description.
+**Exit:** Context understood — brainstorm consumed (if exists), scope clear enough to research.
 
 **If the user provided a brainstorm path or topic:**
 - Read the brainstorm document
@@ -39,6 +51,9 @@ Strategic planning that fits the problem. Simple features get concise plans. Com
 
 ### 2. Research (One Focused Pass)
 
+**Entry:** Context detected. Scope understood.
+**Exit:** Codebase patterns known, past solutions surfaced, constraints identified.
+
 Launch **one subagent** to gather context. Not four parallel agents — one pass that reads what matters.
 
 The subagent should:
@@ -55,6 +70,9 @@ The subagent should:
 **No external research by default.** Only if the topic is genuinely unfamiliar AND the user approves. Most features don't need web searches — they need understanding of what already exists.
 
 ### 3. Calibrate Detail Level
+
+**Entry:** Research complete.
+**Exit:** Detail level chosen and communicated to user.
 
 Auto-calibrate based on complexity. Don't ask the user to pick a detail level — assess it.
 
@@ -80,6 +98,9 @@ DETAILED plan — when:
 **Tell the user what you chose and why:** "This is a standard plan — multi-day work with a few decisions to document. Let me know if you want more or less detail."
 
 ### 4. Write the Plan
+
+**Entry:** Detail level set, research findings available.
+**Exit:** Plan document written with tasks, rationale, and acceptance criteria.
 
 **Output path:** `docs/plans/YYYY-MM-DD-{type}-{kebab-topic}-plan.md`
 
@@ -119,6 +140,9 @@ repo_path: {relative path if cross-repo}
 
 ### 5. Offer Next Steps
 
+**Entry:** Plan written and saved.
+**Exit:** User informed of next steps.
+
 After writing the plan:
 
 ```
@@ -138,6 +162,23 @@ This isn't a generic plan template. It models the Super Intelligence sub-compete
 - **Prompt Mastery (2.2):** The plan IS a well-structured prompt for `/work`. Clear enough that execution requires no guessing.
 - **Strategic AI Dialogue (2.4):** Decision rationale captures the reasoning process — not just the conclusion, but why alternatives were rejected.
 - **Critical Trust (2.1):** Risks are flagged honestly. If something is uncertain, the plan says so instead of projecting false confidence.
+
+## Validate
+
+Before delivering the plan, verify:
+
+- [ ] Tasks are dependency-ordered — not a flat, unordered list
+- [ ] Acceptance criteria are measurable — "users can do X" not "the system is good"
+- [ ] Decision rationale explains WHY, not just WHAT (for standard+ plans)
+- [ ] Someone new could start `/work` from this plan without asking clarifying questions
+- [ ] Plan confidence: **high** if codebase patterns exist, **medium** if new territory, **low** if unclear requirements — stated explicitly
+
+## Confidence Calibration
+
+State plan confidence explicitly in the plan document:
+- **High confidence:** Clear requirements + existing codebase patterns to follow + bounded scope
+- **Medium confidence:** Requirements understood but approach is new territory or involves tradeoffs
+- **Low confidence:** Unclear requirements, ambiguous scope, or significant unknowns — flag these and suggest `/brainstorm` first
 
 ## Anti-patterns
 

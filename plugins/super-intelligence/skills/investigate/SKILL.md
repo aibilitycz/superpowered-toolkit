@@ -44,11 +44,23 @@ All three work the same case. Each sees what the others miss.
 
 **Auto-detected from context.** If you provide a diff, it's a code investigation. If you describe a performance problem, it's performance. You can also specify: `/investigate performance why is the scoring endpoint slow?`
 
+## Common Rationalizations
+
+| Shortcut | Why It Fails | The Cost |
+|----------|-------------|----------|
+| "Jump to Phase 5 — I already know the answer" | Skipping evidence gathering confirms biases, not bugs | Wrong diagnosis → wrong fix → problem persists |
+| "This code looks fine, move on" | Dangerous bugs LOOK correct — that's what makes them dangerous | The bug you didn't investigate is the one that ships |
+| "Not my scope — skip it" | Evidence trails cross boundaries; stopping at an arbitrary line misses root causes | Surface symptom fixed, root cause remains |
+| "The tests pass, so it's correct" | Tests test what the author THOUGHT the code does, not what it ACTUALLY does | False confidence → undetected regression |
+
 ## Method
 
 ### Phase 1: Survey the Scene (Poirot)
 
 *"I do not leap to the conclusions. First, I observe."*
+
+**Entry:** Full evidence available (diff, file paths, error logs, or system description).
+**Exit:** Mental model understood — you can articulate what the system/code intends to do.
 
 Understand the full picture before analyzing:
 - What is happening? What SHOULD be happening?
@@ -59,6 +71,9 @@ Understand the full picture before analyzing:
 ### Phase 2: Examine the Evidence (Holmes)
 
 *"It is a capital mistake to theorize before one has data."*
+
+**Entry:** Mental model from Phase 1 established.
+**Exit:** All premises listed and verified; trails followed to resolution or dead end.
 
 Apply deductive reasoning:
 - What MUST be true for this to work correctly? List the premises.
@@ -76,6 +91,9 @@ Eliminate the impossible: if a value can be null here and there's no null check,
 
 *"Every witness tells you something — even when they lie."*
 
+**Entry:** Surrounding context identified from Phase 2 trails.
+**Exit:** Tests, types, and callers reviewed — story is consistent or contradictions documented.
+
 Study the surrounding context:
 - Do the tests actually test what this does, or what the author WISHES it does?
 - Do the types/schemas tell the same story as the implementation?
@@ -85,6 +103,9 @@ Study the surrounding context:
 ### Phase 4: Just One More Thing (Columbo)
 
 *"Oh, I'm sorry to bother you again, but there's just one more thing that's been nagging at me..."*
+
+**Entry:** Core analysis from Phases 2-3 complete.
+**Exit:** "Missing things" catalog complete — every absence documented with a concrete failure scenario.
 
 The most important phase. Look for what's MISSING:
 - Error cases not handled
@@ -101,6 +122,9 @@ Keep nagging. The thing that seems like a minor detail is often the whole case.
 ### Phase 5: Connect the Evidence (Holmes)
 
 *"The game is afoot."*
+
+**Entry:** All phases 1-4 complete.
+**Exit:** Findings synthesized with evidence; every finding has a certainty level and concrete failure scenario.
 
 Synthesize. The problems that matter most hide at intersections:
 - A type says one thing, the runtime does another
@@ -176,6 +200,16 @@ Each with a concrete scenario of what goes wrong.]
 - **Task Decomposition (2.3):** Complex investigations broken into phased methodology.
 - **Strategic AI Dialogue (2.4):** The detective asks the questions others forgot. It's the thinking partner that pushes back.
 - **Universal.** Code, performance, architecture, data, systems — same methodology, different evidence.
+
+## Validate
+
+Before delivering the case report, verify:
+
+- [ ] Every finding cites a specific location and concrete failure scenario
+- [ ] Certainty levels are calibrated — not everything is CONCLUSIVE
+- [ ] "Just One More Thing" section exists with at least one missing-thing observation
+- [ ] The verdict matches the findings (don't say CLEAN if you found SUSPICIOUS items)
+- [ ] Confidence reflects actual investigation depth, not false certainty
 
 ## Knowledge References
 

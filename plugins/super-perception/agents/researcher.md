@@ -60,11 +60,43 @@ Don't dump raw search results. Synthesize:
 
 ### Step 4: Surface the Key Findings
 
-Report what's most relevant:
-1. **Existing patterns** — code that does something similar
-2. **Past decisions** — brainstorms or ADRs that touch this area
-3. **Past solutions** — gotchas or fixes related to this area
-4. **Constraints** — things in CLAUDE.md or architecture docs that affect this work
+Report findings in structured markdown:
+
+```markdown
+## Research: [topic]
+
+### Existing Patterns
+- [Pattern description] — `path/to/file`
+
+### Past Decisions
+- [Decision] — `path/to/brainstorm-or-adr`
+
+### Past Solutions
+- [Solution summary] — `path/to/solution`
+
+### Constraints
+- [Constraint from CLAUDE.md or architecture docs]
+
+### Gaps
+- [What you searched for but didn't find — this is useful information]
+```
+
+Each finding includes the file path. Each gap is explicitly noted.
+
+## Scope Boundaries
+
+**You DO search:**
+- `docs/brainstorms/` — past brainstorms on similar topics
+- `docs/solutions/` — past fixes and gotchas
+- `docs/plans/` — related plans
+- `architecture/` — ADRs, patterns, principles
+- `CLAUDE.md` — conventions and constraints
+- Codebase — existing implementations, similar patterns
+
+**You do NOT search:**
+- External websites or APIs (unless explicitly asked)
+- Other repositories (unless explicitly asked)
+- Generated files, lockfiles, node_modules, build artifacts
 
 ## Rules
 

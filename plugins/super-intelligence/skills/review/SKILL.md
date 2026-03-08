@@ -18,9 +18,30 @@ allowed-tools:
 
 One focused review. Not nine shallow passes — one deep one that reads carefully, evaluates with evidence, and gives a clear verdict. Works on code, documents, and architecture.
 
+## Common Rationalizations
+
+| Shortcut | Why It Fails | The Cost |
+|----------|-------------|----------|
+| "Skim the diff — I'll catch the important stuff" | The one line you skip is the one that matters. Dangerous bugs look correct. | Bug in production that a careful read would have caught |
+| "No security concerns here" | Auth checks, input validation, and secrets leak through seemingly innocent code | Vulnerability shipped because nobody looked |
+| "The tests pass, so the logic is correct" | Tests verify what the author THOUGHT the code does, not edge cases they missed | False confidence → undetected regression |
+| "Just style nits — not worth mentioning" | Mixing style nits with real findings buries critical issues | Author reads 10 nits, misses the 1 security bug |
+
 ## Workflow
 
+**Quick routing:** What kind of review is this?
+
+| What You're Given | Review Type | Action |
+|-------------------|------------|--------|
+| Branch diff, PR, or code files | **Code review** | Launch strategic-reviewer agent |
+| `.md` file in `docs/plans/` or `docs/brainstorms/` | **Document review** | Read and evaluate against document criteria |
+| Directory path | **Architecture review** | Analyze patterns, conventions, dependencies |
+| Unclear | Ask once: "Reviewing code or the document itself?" | |
+
 ### 1. Detect Review Type
+
+**Entry:** User invoked `/review` with input (or no input = current branch diff).
+**Exit:** Review type determined — code, document, or architecture.
 
 Auto-detect what's being reviewed based on the input:
 
@@ -36,6 +57,9 @@ Auto-detect what's being reviewed based on the input:
 
 ### 2. Gather Context
 
+**Entry:** Review type known.
+**Exit:** Conventions loaded, risk areas identified, related plan/brainstorm read.
+
 Before reviewing, understand what "correct" looks like:
 
 1. **Read the project's CLAUDE.md** for conventions and patterns
@@ -44,6 +68,9 @@ Before reviewing, understand what "correct" looks like:
 4. **Check for test files** in the diff. Note what's tested and what's not.
 
 ### 3. Review
+
+**Entry:** Context gathered, diff/document available.
+**Exit:** Findings documented with evidence and severity.
 
 #### Code Review
 
@@ -87,6 +114,9 @@ Read the full document. Don't skim — read it once, thoroughly. Evaluate agains
 
 ### 4. Present Findings
 
+**Entry:** Review complete with findings.
+**Exit:** Findings presented in structured format with clear verdict.
+
 **For code reviews:**
 
 ```markdown
@@ -103,6 +133,8 @@ Read the full document. Don't skim — read it once, thoroughly. Evaluate agains
 
 ### Verdict: APPROVE / APPROVE WITH NOTES / REQUEST CHANGES
 ```
+
+**Confidence requirement:** Every finding needs [evidence] + [failure scenario]. No evidence = no finding. "This looks off" is not a finding. "This will fail when X because Y" is.
 
 **For document reviews:**
 
@@ -141,6 +173,22 @@ Only suggest when genuinely useful. Most reviews don't produce novel insights �
 - **One deep review > nine shallow ones.** One agent reading carefully produces signal. Nine agents skimming produce noise.
 - **Universal scope.** Code, documents, architecture — one skill, one deep pass. The detective doesn't care whether the evidence is code or prose.
 - **Knowledge compounding bridge.** Reviews aren't just quality gates — they're learning opportunities.
+
+## Validate
+
+**After code review, verify:**
+- [ ] Did I check correctness? (logic errors, edge cases, broken invariants)
+- [ ] Did I check security? (auth, input validation, secrets, OWASP basics)
+- [ ] Did I check conventions? (project patterns, naming, structure)
+- [ ] Did I check simplicity? (YAGNI, unnecessary abstractions)
+- [ ] Did I check test coverage? (critical paths tested, not just happy path)
+
+**After document review, verify:**
+- [ ] Did I check WHY? (decision rationale, not just what)
+- [ ] Did I check risks? (what could go wrong, mitigations)
+- [ ] Did I check scope? (clear in/out of scope)
+- [ ] Did I check criteria? (measurable, testable acceptance criteria)
+- [ ] Did I check actionability? (can `/work` start from this?)
 
 ## When NOT to Use /review
 

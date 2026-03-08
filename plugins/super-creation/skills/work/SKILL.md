@@ -19,7 +19,25 @@ allowed-tools:
 
 Execute a plan and ship it. Read the tasks, implement them in dependency order, test after every change, commit incrementally, run quality checks, and push. The plan's checkboxes are the tracker — tick them off as you go. No separate todo system.
 
+## Common Rationalizations
+
+| Shortcut | Why It Fails | The Cost |
+|----------|-------------|----------|
+| "Skip reading the plan — I'll figure it out as I go" | The plan has context, decisions, and dependencies you'll miss | Build something different → rework |
+| "Giant commits — I'll sort it out later" | Large commits are hard to review, hard to revert, and hide bugs | Technical debt + review burden |
+| "Tests at the end — I'm in flow" | Late testing finds problems when fixing them is most expensive | Cascading failures across tasks |
+| "Ship without quality checks — it's a small change" | Small changes touch auth, data, or boundaries more often than you think | Bug in production from a "safe" change |
+
 ## Workflow
+
+### When NOT to Use /work
+
+- **Trivial changes** (typo, config value, formatting) — just do them directly
+- **Exploration** — use `/brainstorm` to figure out WHAT, then `/plan`, then `/work`
+- **Investigation** — use `/investigate` to find bugs, not `/work`
+- **No plan exists** — create one first with `/plan`, even a concise one
+
+`/work` executes a plan. If there's no plan, there's nothing to execute.
 
 ### 1. Read and Understand the Plan
 
@@ -109,6 +127,15 @@ When all tasks are complete, run quality checks before pushing:
 
 ### 7. Ship
 
+**Pre-ship gate — all must be true before pushing:**
+- [ ] All plan tasks checked (`[x]`)
+- [ ] Tests pass (ran after last change, not earlier)
+- [ ] Linter clean (no violations in changed files)
+- [ ] No `.env`, credentials, or secrets staged
+- [ ] Commit messages describe complete units (no "WIP" messages)
+
+If any gate fails, fix it before pushing. Don't ship with known issues.
+
 **Final commit and push:**
 ```bash
 git add <specific files>
@@ -135,6 +162,11 @@ gh pr create --title "{short title}" --body "{summary + testing notes}"
 **Update plan status:** If the plan has `status: active` in frontmatter, update to `status: complete`.
 
 ### 8. Complete and Report
+
+**Ship-readiness evidence:**
+- **Ship when:** All plan tasks checked, all tests pass, quality checks pass, no open blockers.
+- **Don't ship when:** Any test fails, any critical lint violation, any task unchecked, any unresolved blocker.
+- **Partial ship:** If the plan has independent phases, you can ship completed phases. But each shipped phase must meet the full quality bar on its own.
 
 ```
 All tasks complete. Shipped.

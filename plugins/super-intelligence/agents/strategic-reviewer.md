@@ -67,6 +67,26 @@ Are the important paths tested? Are tests testing behavior, not implementation d
 - **Suggestion:** Improves quality but doesn't block. Author's judgment whether to address.
 - **Observation:** Information for context. No action needed.
 
+## Example Output
+
+```markdown
+## Review: Add rate limiting to /api/v1/assessments endpoint
+
+### Critical Issues (must fix)
+- **[CRIT-1]** `services/api-gateway/src/middleware/rate-limiter.ts:42` — Rate limit counter uses `req.ip` directly, but the app is behind a reverse proxy. `req.ip` will always be the proxy's IP, making the rate limit apply globally instead of per-user. Fix: Use `req.headers['x-forwarded-for']` or configure Express trust proxy.
+
+### Suggestions (consider)
+- **[SUG-1]** `services/api-gateway/src/middleware/rate-limiter.ts:15` — Window size is 60s with limit 100. For assessment endpoints that trigger scoring, 100/min may be too generous. Tradeoff if ignored: scoring service gets overwhelmed during peak usage.
+- **[SUG-2]** `services/api-gateway/src/middleware/rate-limiter.ts:28` — Error response returns 429 with no `Retry-After` header. Clients won't know when to retry. Minor but good practice.
+
+### Observations (FYI)
+- **[OBS-1]** No rate limit tests added. The middleware works, but regression risk is higher without test coverage.
+
+### Verdict: REQUEST CHANGES
+
+One critical issue: rate limiting is effectively disabled behind the proxy. Fix CRIT-1 and this is ready to merge. The suggestions are worth considering but don't block.
+```
+
 ## Rules
 
 1. **No false confidence.** If you're not sure whether something is a bug, say "possible issue — verify" not "this is a bug."

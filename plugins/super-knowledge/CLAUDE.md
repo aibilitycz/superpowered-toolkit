@@ -74,6 +74,7 @@ What's the question about?
 | [Knowledge Architect](agents/knowledge-architect.md) | sonnet | Context engineering — builds and maintains structured knowledge docs |
 | [Psychometry Expert](agents/psychometry-expert.md) | sonnet | Deep cross-domain psychometric analysis (3+ domains) |
 | [Assessment Auditor](agents/assessment-auditor.md) | sonnet | Autonomous instrument review with structured audit report |
+| [Skill Reviewer](agents/skill-reviewer.md) | sonnet | Grade skills and agents A-F against the toolkit's quality bar |
 
 ## Knowledge
 

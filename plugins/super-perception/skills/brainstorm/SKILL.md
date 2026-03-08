@@ -18,9 +18,19 @@ allowed-tools:
 
 Collaborative discovery before planning. Brainstorming answers **WHAT** to build and **WHY** — it precedes `/plan`, which answers **HOW**.
 
+## Common Rationalizations
+
+| Shortcut | Why It Fails | The Cost |
+|----------|-------------|----------|
+| "Skip reframing — the user already knows what they want" | Users describe solutions, not problems. Without reframing, you build the wrong thing. | Days of rework when the real need surfaces |
+| "Skip research — I'll brainstorm from scratch" | Reinventing what exists. The codebase has patterns, past brainstorms have context. | Wasted effort + inconsistency with existing decisions |
+| "Keep exploring — we haven't found the perfect approach" | Diminishing returns. After 2-3 solid options, more exploration adds noise, not signal. | Analysis paralysis → nothing ships |
+
 ## Workflow
 
 ### 1. Assess Whether Brainstorming Is Needed
+
+**Entry:** User has a topic or problem area. Can be vague — that's why we brainstorm.
 
 Not everything needs a brainstorm.
 
@@ -94,6 +104,8 @@ Also capture:
 
 ### 6. Write Brainstorm Document
 
+**Exit:** Document written with explicit decisions, rationale, and open questions. `/plan` can start from this without guessing.
+
 **Output path:** `docs/brainstorms/YYYY-MM-DD-{kebab-topic}-brainstorm.md`
 
 **YAML frontmatter:**
@@ -151,6 +163,16 @@ Next: /plan to turn these decisions into an implementation plan.
 - **Opportunity Recognition (1.2):** The researcher agent surfaces past work, patterns, and prior art. You see what's already there before building something new.
 - **AI-Augmented Discovery (1.3):** Multi-source research synthesized into insights. The agent connects dots across brainstorms, solutions, and code.
 - **AI Curiosity (1.1):** Exploring multiple approaches before committing. The brainstorm rewards looking around, not jumping to the first idea.
+
+## Validate
+
+Before delivering the brainstorm document, verify:
+
+- [ ] Problem was reframed — not just accepted at face value
+- [ ] At least 2 approaches were explored with tradeoffs
+- [ ] Every decision has rationale and rejected alternatives documented
+- [ ] Open questions are listed — nothing swept under the rug
+- [ ] `/plan` can start from this document without asking "but what did you decide about X?"
 
 ## Anti-patterns
 

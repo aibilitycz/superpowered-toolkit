@@ -27,6 +27,15 @@ Deep reasoning for decisions that matter. Not for every question — for the one
 
 **When NOT to use /think:** For decisions that are easily reversible, low-stakes, or have obvious answers. Just decide and move.
 
+## Common Rationalizations
+
+| Shortcut | Why It Fails | The Cost |
+|----------|-------------|----------|
+| "Default to Expert Panel for everything" | Expert Panel is versatile but not always the right lens. A security decision needs Devil's Advocate, not five generalist opinions. | Generic advice that misses the specific risk |
+| "High confidence — the analysis is thorough" | Most decisions are genuinely medium confidence. Claiming high confidence without strong evidence is intellectual dishonesty. | Over-commitment to a choice that should have been hedged |
+| "Skip the counter-argument" | If you can't articulate why the alternative might be better, you don't understand the tradeoff | Blind spot becomes the failure mode |
+| "The first framing is fine" | How you frame the question determines what answers you can see. A bad frame produces a confident wrong answer. | Solving the wrong problem with rigor |
+
 ## Workflow
 
 ### 1. Frame the Question
@@ -129,12 +138,35 @@ Every `/think` session ends with a clear recommendation:
 
 If there's no clear winner, say so. "Both A and B are defensible. Here's the tiebreaker question: [the one thing that determines which is better]."
 
+**Confidence calibration:**
+- **High:** Strong evidence, clear consensus across perspectives, low uncertainty. Rare — most decisions don't reach this bar.
+- **Medium:** Good reasoning, reasonable evidence, but genuine uncertainty remains. This is the honest default for most decisions.
+- **Low:** Significant unknowns, conflicting evidence, or insufficient context. Name what's missing.
+
 ## What Makes This Superpowered
 
 - **Critical Trust (2.1):** You don't trust your first instinct on hard decisions. You stress-test it.
 - **Strategic AI Dialogue (2.4):** This IS strategic AI dialogue — using AI as a thinking partner, not just an executor.
 - **Task Decomposition (2.3):** Complex decisions get decomposed into evaluable components.
 - **The thinking that prevents rework.** 30 minutes of `/think` before a week of `/work` often saves the week.
+
+## Validate
+
+Before delivering the recommendation, verify:
+
+- [ ] Recommendation is actionable — not "it depends" but "do X, because Y"
+- [ ] There's a concrete next step — what does the user DO with this analysis?
+- [ ] Confidence is calibrated — not "high" by default. Most decisions are medium confidence.
+- [ ] The counter-argument was addressed — you can articulate why the rejected option might have been better
+- [ ] If confidence is low, that's stated explicitly with what would increase it
+
+## Anti-patterns
+
+- **Thinking instead of doing.** `/think` is for genuinely hard decisions. If the answer is obvious, just decide and move.
+- **Infinite modes.** Pick one mode and commit. Don't run Expert Panel AND Devil's Advocate AND What-If. One good analysis beats three shallow ones.
+- **Fake precision.** A tradeoff matrix with made-up scores (7/10 vs 6/10) creates illusion of rigor. If you can't justify the scores, use qualitative comparison.
+- **Deferring the decision.** `/think` should end with a recommendation, not "it depends." If it truly depends, name the ONE tiebreaker question that resolves it.
+- **Overthinking reversible decisions.** Two-way doors don't need deep analysis. Save `/think` for one-way doors.
 
 ## Knowledge References
 

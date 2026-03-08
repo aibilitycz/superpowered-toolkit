@@ -22,6 +22,15 @@ Capture knowledge while context is fresh. Solutions, context docs, learnings —
 
 **Why "compound"?** Each piece of captured knowledge compounds your team's effectiveness. The first time you solve a problem takes research. Document it, and the next occurrence takes minutes. Knowledge compounds.
 
+## Common Rationalizations
+
+| Shortcut | Why It Fails | The Cost |
+|----------|-------------|----------|
+| "Skip duplicate check — I'll just write a new doc" | Parallel docs drift. Two docs about the same thing eventually contradict each other. | Knowledge drift → wrong fix applied next time |
+| "Skip frontmatter — it's just metadata" | Frontmatter IS the search index. Without it, the solution is unfindable. | Knowledge captured but never surfaced → wasted effort |
+| "Good enough — I'll refine later" | You won't. Context is freshest NOW. Later, you'll forget the nuance. | Incomplete doc → next person can't reproduce the fix |
+| "Too trivial to document" | The "trivial" fix that took you 30 minutes will take someone else 30 minutes too | Repeated debugging of known problems |
+
 ## Workflow
 
 ### 1. Detect What to Capture
@@ -145,6 +154,18 @@ Searchable by: {list of frontmatter keywords or section}
 - **Context Engineering (3.3):** Preparing the right context for AI consumption — structured, typed, discoverable.
 - **Knowledge Architecture (3.2):** Solutions with frontmatter for machine retrieval. Context docs organized by type and purpose. Not random docs — structured knowledge.
 - **Cross-plugin bridge:** Other plugins surface this knowledge. `/plan` checks `docs/solutions/` before planning. `/review` suggests `/compound` when it finds insights.
+
+## Validate
+
+Before delivering the captured knowledge, verify:
+
+- [ ] **Findable:** Search for the symptoms — does this doc surface? Are frontmatter keywords what someone would actually search for?
+- [ ] **Reproducible:** Could someone reproduce the problem from the symptoms description alone?
+- [ ] **Verified:** Root cause is confirmed (not just a theory). Fix was tested (not just proposed).
+- [ ] **No duplicates:** Searched `docs/solutions/`, `CLAUDE.md`, `knowledge/` — this is genuinely new
+- [ ] **Correctly typed:** Solution doc vs. context doc vs. learning — each has different structure and location
+
+**If any element is missing, note it:** "Root cause is suspected but not confirmed — needs verification" is better than leaving it out silently.
 
 ## Anti-patterns
 

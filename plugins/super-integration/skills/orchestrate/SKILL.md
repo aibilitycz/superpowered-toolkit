@@ -23,11 +23,9 @@ The conductor. Detects where you are in the superpowered workflow, suggests the 
 /plan (Super Intelligence)
     ↓ reads brainstorm, writes: docs/plans/YYYY-MM-DD-{topic}-plan.md
 /work (Super Creation)
-    ↓ reads plan, executes tasks, commits incrementally
+    ↓ reads plan, executes tasks, commits incrementally, ships (quality checks + push)
 /review (Super Intelligence)
     ↓ reads changes, produces evidence-based review
-/ship (Super Creation)
-    ↓ quality checks, release notes, push
 /compound (Super Knowledge)
     ↓ captures solution: docs/solutions/{domain}/{topic}.md
 ```
@@ -36,7 +34,21 @@ Not every task needs the full loop. Small fixes skip brainstorm and plan. Medium
 
 ## Workflow
 
+**Keyword routing — what the user says → what to suggest:**
+
+| User Says | Suggest |
+|-----------|---------|
+| "I have an idea" / "what should we build" / "explore" | `/brainstorm` |
+| "plan this" / "how should we build" / "break this down" | `/plan` |
+| "let's build" / "start working" / "execute" / "implement" | `/work {plan-path}` |
+| "review this" / "check the code" / "is this ready" | `/review` |
+| "document this" / "save this fix" / "capture" | `/compound` |
+| "what's next" / "where are we" / "status" | Run the detect → assess flow below |
+
 ### 1. Detect Current State
+
+**Entry:** User invoked `/orchestrate` or asked "what's next?"
+**Exit:** Workflow artifacts scanned — brainstorms, plans, branches, solutions cataloged.
 
 Scan the project for workflow artifacts:
 
@@ -57,6 +69,9 @@ ls -la docs/solutions/**/*.md 2>/dev/null | tail -5
 
 ### 2. Assess Phase
 
+**Entry:** Artifacts scanned.
+**Exit:** Current phase identified with confidence.
+
 Based on what exists, determine where the user is:
 
 | Signals | Phase | Suggest |
@@ -65,11 +80,14 @@ Based on what exists, determine where the user is:
 | Recent brainstorm, no plan | **Planning** | `/plan {brainstorm-path}` — turn decisions into a plan |
 | Active plan with unchecked tasks | **Execution** | `/work {plan-path}` — start building |
 | Active plan, all tasks checked | **Review** | `/review` — check the code before shipping |
-| Review complete, tests passing | **Shipping** | `/ship` — finalize and push |
+| Review complete, tests passing | **Finalize** | `/work` — finalize and push (shipping is step 7 of /work) |
 | Just shipped or fixed something non-trivial | **Compounding** | `/compound` — capture the solution |
 | Everything current is shipped | **Done** | No action needed. Start a new cycle when ready. |
 
 ### 3. Present Status and Recommendation
+
+**Entry:** Phase assessed.
+**Exit:** Status and recommendation presented to user.
 
 ```markdown
 ## Workflow Status
@@ -89,6 +107,9 @@ Based on what exists, determine where the user is:
 
 ### 4. Route to the Right Superpower
 
+**Entry:** User chose a next step.
+**Exit:** User guided to the correct skill with the right arguments.
+
 After the user chooses:
 - Guide them to invoke the right skill
 - Provide the correct argument (e.g., the brainstorm path for `/plan`)
@@ -102,8 +123,8 @@ Not everything needs the full loop:
 |-----------|-----------------|
 | **Trivial** (typo, config) | Just fix it. No workflow needed. |
 | **Small** (< 1 hour, clear scope) | `/work` → commit. Skip brainstorm, plan, and review. |
-| **Medium** (1-3 days, clear approach) | `/plan` → `/work` → `/review` → `/ship` |
-| **Large** (multi-day, unclear approach) | Full loop: `/brainstorm` → `/plan` → `/work` → `/review` → `/ship` → `/compound` |
+| **Medium** (1-3 days, clear approach) | `/plan` → `/work` → `/review` |
+| **Large** (multi-day, unclear approach) | Full loop: `/brainstorm` → `/plan` → `/work` → `/review` → `/compound` |
 | **Exploration** (no clear goal yet) | `/brainstorm` only. Decide next steps after. |
 
 ## Cross-Plugin Conventions
