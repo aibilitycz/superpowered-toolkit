@@ -6,15 +6,33 @@
   },
   "plugins": [
     {
-      "name": "psychometric-ai-toolkit",
-      "source": "./plugins/psychometric-ai-toolkit",
-      "description": "Expert-level psychometric, psychological, and statistical expertise for building AI-powered assessments. 9 knowledge domains, 3 skills, 2 agents — grounded in peer-reviewed research.",
-      "version": "0.2.0"
+      "name": "super-perception",
+      "source": "./plugins/super-perception",
+      "description": "Discovery, brainstorming, and problem reframing — see what others miss before building.",
+      "version": "0.1.0"
     },
     {
       "name": "super-intelligence",
       "source": "./plugins/super-intelligence",
-      "description": "Strategic planning, focused code review, and critical evaluation — 3 skills, 1 agent, grounded in SP Superpower 2.",
+      "description": "Strategic planning, focused code review, and critical evaluation — 3 skills, 1 agent.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "super-knowledge",
+      "source": "./plugins/super-knowledge",
+      "description": "Knowledge compounding, context engineering, and expert psychometric knowledge — 5 skills, 3 agents, 9 domains.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "super-creation",
+      "source": "./plugins/super-creation",
+      "description": "Execute plans, ship features, and build at speed — AI does 90%, you craft the 10%.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "super-integration",
+      "source": "./plugins/super-integration",
+      "description": "Cross-plugin workflow orchestration — brainstorm to plan to work to review to compound.",
       "version": "0.1.0"
     }
   ]

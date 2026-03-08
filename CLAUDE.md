@@ -1,36 +1,52 @@
 # Superpowered Toolkit
 
-Plugin marketplace for the Superpowered Professional methodology. Every plugin here is derived from and anchored to the SP methodology's 5 Superpowers, 20 sub-competencies, and assessment framework.
+Plugin marketplace for the Superpowered Professional methodology. 5 superpower plugins — one per SP dimension — that replace generic workflows with superpowered alternatives.
 
 ## Architecture
 
 ```
 superpowered-toolkit/
 ├── METHODOLOGY.md              # Meta-framework: layers, anchors, quality gates
+├── CONVENTIONS.md              # Shared file naming, frontmatter, structure
 ├── .claude-plugin/
 │   └── marketplace.json        # Plugin registry for Claude Code
 ├── plugins/
-│   ├── psychometric-ai-toolkit/  # MEASURE layer — assessment science
-│   └── [future plugins]
+│   ├── super-perception/       # Superpower 1 — discovery, brainstorming
+│   ├── super-intelligence/     # Superpower 2 — planning, review, evaluation
+│   ├── super-knowledge/        # Superpower 3 — compounding, context, psychometrics
+│   ├── super-creation/         # Superpower 4 — execution, shipping
+│   └── super-integration/      # Superpower 5 — orchestration, workflow
 └── CONTRIBUTING.md             # Quality gates for contributions
 ```
 
-**Read `METHODOLOGY.md` first** — it defines the four capability layers (MEASURE, DEVELOP, BUILD, GOVERN), the methodology anchor rule, and plugin quality standards.
+**Read `METHODOLOGY.md` first** — it defines the methodology anchor rule and plugin quality standards.
+**Read `CONVENTIONS.md`** — shared conventions for file naming, frontmatter, and cross-references.
 
 ## Key Rules
 
 1. **Every plugin has a methodology anchor.** No anchor = doesn't belong here. See METHODOLOGY.md.
-2. **Evidence-grounded.** All claims cite sources tagged `[academic]`, `[standards]`, or `[practitioner]`.
+2. **Evidence-grounded.** Claims cite sources where applicable (especially MEASURE-layer content).
 3. **Evidence strength on recommendations.** `[strong]`, `[moderate]`, `[emerging]`, `[consensus]`.
-4. **SP-specific overrides generic.** When SP methodology conflicts with a plugin's generic recommendation, SP wins for Aimee implementations. Generic applies elsewhere.
+4. **SP-specific overrides generic.** When SP methodology conflicts with a plugin's generic recommendation, SP wins for SP implementations. Generic applies elsewhere.
 5. **Fairness is non-negotiable.** Any plugin touching scoring, items, or decisions must address DIF/fairness.
 
 ## Plugins
 
-| Plugin | Layer | Version | What It Does |
-|--------|-------|---------|-------------|
-| [psychometric-ai-toolkit](plugins/psychometric-ai-toolkit/) | MEASURE | 0.2.0 | 9 domain knowledge files, 3 skills, 2 agents for psychometric assessment science |
-| [super-intelligence](plugins/super-intelligence/) | BUILD | 0.1.0 | Strategic planning, focused code review, critical evaluation — 3 skills, 1 agent |
+| Plugin | Superpower | Version | What It Does |
+|--------|-----------|---------|-------------|
+| [super-perception](plugins/super-perception/) | 1. Perception | 0.1.0 | `/brainstorm` — discovery, problem reframing, research |
+| [super-intelligence](plugins/super-intelligence/) | 2. Intelligence | 0.1.0 | `/plan`, `/review`, `/document-review` — planning, code review, evaluation |
+| [super-knowledge](plugins/super-knowledge/) | 3. Knowledge | 0.1.0 | `/compound`, `/context` + psychometric domain (9 domains, 5 skills, 3 agents) |
+| [super-creation](plugins/super-creation/) | 4. Creation | 0.1.0 | `/work`, `/ship` — execution, quality checks, release notes |
+| [super-integration](plugins/super-integration/) | 5. Integration | 0.1.0 | `/orchestrate` — cross-plugin workflow conductor |
+
+## The Full Loop
+
+```
+/brainstorm (Perception) → /plan (Intelligence) → /work (Creation) → /review (Intelligence) → /ship (Creation) → /compound (Knowledge)
+```
+
+Not every task needs the full loop. Match the flow to the task size and risk.
 
 ## Install
 
@@ -38,8 +54,12 @@ superpowered-toolkit/
 # Add marketplace (once)
 /plugin marketplace add aibilitycz/superpowered-toolkit
 
-# Install a plugin
-/plugin install psychometric-ai-toolkit@superpowered-toolkit
+# Install individual plugins
+/plugin install super-perception@superpowered-toolkit
+/plugin install super-intelligence@superpowered-toolkit
+/plugin install super-knowledge@superpowered-toolkit
+/plugin install super-creation@superpowered-toolkit
+/plugin install super-integration@superpowered-toolkit
 ```
 
 ## SP Methodology Reference
