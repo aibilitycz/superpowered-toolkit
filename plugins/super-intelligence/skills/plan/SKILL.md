@@ -126,7 +126,7 @@ Plan ready at docs/plans/YYYY-MM-DD-{type}-{topic}-plan.md
 
 Options:
 - Review it and refine → I'll adjust based on your feedback
-- /document-review → structured evaluation before starting
+- /review → structured evaluation before starting
 - /work → start implementing
 ```
 
