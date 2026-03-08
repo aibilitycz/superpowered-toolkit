@@ -2,7 +2,16 @@
 
 Expert-level psychometric knowledge for AI-assisted assessment development. All guidance grounded in peer-reviewed research.
 
-**Methodology Anchor:** MEASURE layer — serves all 5 Superpowers (Perception, Intelligence, Knowledge, Creation, Integration). Provides the measurement science that underpins dimension scores, composite weights, and assessment decisions. See `../../METHODOLOGY.md`.
+## Methodology Anchor
+
+- **Layer:** MEASURE (primary capability layer in the Superpowered Toolkit framework)
+- **Superpowers served:** All 5 — Perception, Intelligence, Knowledge, Creation, Integration
+- **Methodology components:** L1 scoring, L2 scoring, item calibration, reliability, validity, composite weights
+- **Why this belongs:** You cannot assess the 5 superpowers without psychometrically sound measurement. Every dimension score, composite weight, and assessment decision depends on the science encoded here.
+
+See `../../METHODOLOGY.md` for the four capability layers (MEASURE/DEVELOP/BUILD/GOVERN), methodology anchor rule, and conflict resolution.
+
+**Overlay rule:** When SP methodology makes a specific decision (e.g., 35/30/25/10 composite weights), it overrides generic toolkit recommendations for Aimee/SP implementations. Generic advice applies for non-SP use cases.
 
 ## Core Principles
 
