@@ -11,61 +11,73 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - Bash
+  - AskUserQuestion
 ---
 
 # Think
 
-Deep reasoning for decisions that matter. Not for every question — for the ones where getting it wrong is expensive. Expert perspectives, devil's advocate, what-if scenarios, and structured tradeoff analysis.
+Deep reasoning for decisions that matter. Expert perspectives, devil's advocate, what-if scenarios, and structured tradeoff analysis.
 
-## When to Use /think
+## Boundaries
 
-- **High-stakes decisions** — architecture choices, scoring formula changes, security design
-- **Multiple valid approaches** — you need to weigh tradeoffs, not just pick one
-- **Stress-testing** — you have a plan and want to find the holes before building
-- **Stuck** — you've been going in circles and need a structured way out
+**This skill MAY:** read code/docs for context, reason, analyze, present conclusions.
+**This skill MAY NOT:** edit code, create files, run commands, implement anything, deploy.
 
-**When NOT to use /think:** For decisions that are easily reversible, low-stakes, or have obvious answers. Just decide and move.
+**This is thinking, not doing. Present the analysis — the user decides what to act on.**
 
 ## Common Rationalizations
 
 | Shortcut | Why It Fails | The Cost |
 |----------|-------------|----------|
-| "Default to Expert Panel for everything" | Expert Panel is versatile but not always the right lens. A security decision needs Devil's Advocate, not five generalist opinions. | Generic advice that misses the specific risk |
-| "High confidence — the analysis is thorough" | Most decisions are genuinely medium confidence. Claiming high confidence without strong evidence is intellectual dishonesty. | Over-commitment to a choice that should have been hedged |
-| "Skip the counter-argument" | If you can't articulate why the alternative might be better, you don't understand the tradeoff | Blind spot becomes the failure mode |
-| "The first framing is fine" | How you frame the question determines what answers you can see. A bad frame produces a confident wrong answer. | Solving the wrong problem with rigor |
+| "Default to Expert Panel for everything" | Not always the right lens. A security decision needs Devil's Advocate. | Generic advice that misses the specific risk |
+| "High confidence — the analysis is thorough" | Most decisions are genuinely medium confidence. | Over-commitment to a choice that should have been hedged |
+| "Skip the counter-argument" | If you can't articulate why the alternative might be better, you don't understand the tradeoff. | Blind spot becomes the failure mode |
+| "The first framing is fine" | How you frame the question determines what answers you see. | Solving the wrong problem with rigor |
 
-## Workflow
+---
 
-### 1. Frame the Question
+## Phase 0: Frame the Question
 
-**If invoked with a question** (e.g., `/think should we use WebSockets or SSE for real-time updates?`):
-- Use the question as the starting point
+**Entry:** User invoked `/think` with a question, topic, or nothing.
+
+**If invoked with a question** (e.g., `/think should we use WebSockets or SSE?`):
+- Use the question as starting point
 - Gather relevant context: what does the codebase currently do? What are the constraints?
 
 **If invoked without a question:**
-- Ask: "What decision or problem do you want to think through?"
+Use **AskUserQuestion** to ask: "What decision or problem do you want to think through?"
 
-**If invoked with `ultrathink`** (e.g., `/think ultrathink`):
-- Enable extended thinking mode — deeper analysis, more perspectives, longer chains of reasoning
+**If invoked with `ultrathink`:**
+- Enable extended thinking — deeper analysis, more perspectives, longer reasoning chains
 
-### 2. Choose the Mode
+**Exit:** Question framed, context available.
+
+---
+
+## Phase 1: Choose the Mode
+
+**Entry:** Question framed.
 
 | Mode | When | What It Does |
 |------|------|-------------|
 | **Expert Panel** | Multiple domains intersect | Simulate 3-5 relevant expert perspectives |
-| **Devil's Advocate** | You have a preferred option | Systematically attack it. Find every reason it fails. |
-| **What-If Analysis** | Uncertain about consequences | Trace each option forward through concrete scenarios |
-| **Tradeoff Matrix** | Comparing options across criteria | Structured comparison with weighted criteria |
+| **Devil's Advocate** | You have a preferred option | Systematically attack it |
+| **What-If Analysis** | Uncertain about consequences | Trace each option through scenarios |
+| **Tradeoff Matrix** | Comparing options across criteria | Structured weighted comparison |
 
-**If mode isn't obvious from the question, default to Expert Panel** — it's the most versatile.
+**If mode isn't obvious from the question:** Use **AskUserQuestion** to present the four modes and ask which fits best. If user says "you pick," default to Expert Panel.
 
-### 3. Think
+**Exit:** Mode chosen.
 
-#### Expert Panel
+---
 
-Identify 3-5 relevant expert perspectives based on the question. Not generic experts — specific perspectives that illuminate different facets of THIS decision.
+## Phase 2: Think
+
+**Entry:** Mode chosen, context available.
+
+### Expert Panel
+
+Identify 3-5 relevant expert perspectives based on THIS question — not generic experts.
 
 For each expert:
 ```
@@ -85,33 +97,28 @@ Where they disagree: [tensions]
 The key tradeoff: [the core tension to resolve]
 ```
 
-#### Devil's Advocate
-
-Take the proposed approach and systematically attack it:
+### Devil's Advocate
 
 1. **Steel man it first** — state the strongest version of why this approach makes sense
-2. **Attack the assumptions** — what must be true for this to work? Is each assumption actually true?
+2. **Attack the assumptions** — what must be true for this to work? Is each actually true?
 3. **Find the failure modes** — how does this break? Under what conditions?
-4. **Identify the hidden costs** — what does this approach make harder in the future?
+4. **Identify the hidden costs** — what does this make harder in the future?
 5. **Propose the counter-argument** — what's the strongest alternative?
 
-#### What-If Analysis
+### What-If Analysis
 
-For each option, trace forward through concrete scenarios:
-
+For each option:
 ```
 ### Option A: [name]
 
-**If it goes well:** [best realistic outcome, with specifics]
-**If it goes okay:** [likely outcome, with specifics]
-**If it goes badly:** [worst realistic outcome, with specifics]
-**Reversibility:** [how hard is it to undo this decision?]
-**What you learn:** [what does this choice teach you, even if it fails?]
+**If it goes well:** [best realistic outcome]
+**If it goes okay:** [likely outcome]
+**If it goes badly:** [worst realistic outcome]
+**Reversibility:** [how hard to undo]
+**What you learn:** [what this choice teaches you, even if it fails]
 ```
 
-#### Tradeoff Matrix
-
-Define criteria, weight them, score each option:
+### Tradeoff Matrix
 
 ```
 | Criterion (weight) | Option A | Option B | Option C |
@@ -123,7 +130,13 @@ Define criteria, weight them, score each option:
 | **Weighted total**  | **7.4**  | **7.0**  | **6.5**  |
 ```
 
-### 4. Conclude
+**Exit:** Analysis complete for the chosen mode.
+
+---
+
+## Phase 3: Conclude
+
+**Entry:** Analysis complete.
 
 Every `/think` session ends with a clear recommendation:
 
@@ -132,44 +145,66 @@ Every `/think` session ends with a clear recommendation:
 
 **Do:** [specific recommendation]
 **Because:** [1-2 sentence reasoning]
-**Risk:** [the main risk of this choice and how to mitigate it]
+**Risk:** [the main risk and how to mitigate it]
 **Confidence:** [low/medium/high] — [why]
 ```
 
-If there's no clear winner, say so. "Both A and B are defensible. Here's the tiebreaker question: [the one thing that determines which is better]."
-
 **Confidence calibration:**
-- **High:** Strong evidence, clear consensus across perspectives, low uncertainty. Rare — most decisions don't reach this bar.
-- **Medium:** Good reasoning, reasonable evidence, but genuine uncertainty remains. This is the honest default for most decisions.
-- **Low:** Significant unknowns, conflicting evidence, or insufficient context. Name what's missing.
+- **High:** Strong evidence, clear consensus, low uncertainty. Rare — most decisions don't reach this bar.
+- **Medium:** Good reasoning, genuine uncertainty remains. The honest default.
+- **Low:** Significant unknowns, conflicting evidence. Name what's missing.
 
-## What Makes This Superpowered
+If no clear winner: "Both A and B are defensible. The tiebreaker question is: [the one thing that determines which is better]."
 
-- **Critical Trust (2.1):** You don't trust your first instinct on hard decisions. You stress-test it.
-- **Strategic AI Dialogue (2.4):** This IS strategic AI dialogue — using AI as a thinking partner, not just an executor.
-- **Task Decomposition (2.3):** Complex decisions get decomposed into evaluable components.
-- **The thinking that prevents rework.** 30 minutes of `/think` before a week of `/work` often saves the week.
+**Exit:** Recommendation delivered.
+
+---
+
+## Phase 4: Handoff
+
+**Entry:** Recommendation delivered.
+
+Use **AskUserQuestion** to present options:
+
+**Question:** "Analysis complete. What would you like to do?"
+
+**Options:**
+1. **Proceed with recommendation** — Move to `/plan` or `/work`
+2. **Challenge a point** — Push back on something in the analysis
+3. **Try a different mode** — Analyze with a different lens (e.g., Devil's Advocate after Expert Panel)
+4. **Done** — Analysis sufficient, move on
+
+**If user selects "Challenge a point":** Discuss, update the analysis if warranted, then return to this choice.
+
+**If user selects "Try a different mode":** Return to Phase 2 with a new mode. Combine insights from both passes.
+
+---
 
 ## Validate
 
 Before delivering the recommendation, verify:
 
 - [ ] Recommendation is actionable — not "it depends" but "do X, because Y"
-- [ ] There's a concrete next step — what does the user DO with this analysis?
-- [ ] Confidence is calibrated — not "high" by default. Most decisions are medium confidence.
-- [ ] The counter-argument was addressed — you can articulate why the rejected option might have been better
-- [ ] If confidence is low, that's stated explicitly with what would increase it
+- [ ] There's a concrete next step — what does the user DO with this?
+- [ ] Confidence is calibrated — not "high" by default
+- [ ] Counter-argument was addressed — can articulate why the rejected option might have been better
+- [ ] No code was written, no files modified — analysis only
 
-## Anti-patterns
+## When NOT to Use /think
 
-- **Thinking instead of doing.** `/think` is for genuinely hard decisions. If the answer is obvious, just decide and move.
-- **Infinite modes.** Pick one mode and commit. Don't run Expert Panel AND Devil's Advocate AND What-If. One good analysis beats three shallow ones.
-- **Fake precision.** A tradeoff matrix with made-up scores (7/10 vs 6/10) creates illusion of rigor. If you can't justify the scores, use qualitative comparison.
-- **Deferring the decision.** `/think` should end with a recommendation, not "it depends." If it truly depends, name the ONE tiebreaker question that resolves it.
-- **Overthinking reversible decisions.** Two-way doors don't need deep analysis. Save `/think` for one-way doors.
+- **Easily reversible decisions.** Two-way doors don't need deep analysis. Just decide.
+- **Obvious answers.** If you already know, skip the ceremony.
+- **Implementation questions.** "How do I implement X" → use `/plan`, not `/think`.
+
+## What Makes This Superpowered
+
+- **Critical Trust (2.1):** Stress-tests thinking instead of trusting first instinct.
+- **Strategic AI Dialogue (2.4):** AI as thinking partner, not executor.
+- **Task Decomposition (2.3):** Complex decisions decomposed into evaluable components.
+- **The thinking that prevents rework.** 30 minutes of `/think` before a week of `/work` often saves the week.
 
 ## Knowledge References
 
 - `../knowledge/decision-frameworks.md` — Stakes matrix, when to decide fast vs. slow
 - `../knowledge/critical-evaluation.md` — Evidence types, uncertainty flagging
-- `../knowledge/strategic-decomposition.md` — Breaking complex problems into evaluable parts
+- `../knowledge/strategic-decomposition.md` — Breaking complex problems into parts

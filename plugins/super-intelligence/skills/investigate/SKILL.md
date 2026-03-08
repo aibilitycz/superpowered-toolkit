@@ -11,111 +11,129 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
+  - AskUserQuestion
   - Bash
 ---
 
 # Investigate
 
-Detective-style investigation. Not a checklist runner, not a linter — a detective that follows evidence trails, notices what's missing, and connects things others overlook.
+Detective-style investigation. Follow evidence trails, notice what's missing, connect what others overlook.
+
+## Boundaries
+
+**This skill MAY:** read code, run diagnostic commands (read-only), trace evidence, present findings.
+**This skill MAY NOT:** edit code, fix issues, create PRs, deploy. The only Bash allowed is read-only diagnostics (git log, curl for status, kubectl get, etc.).
+
+**This is an investigation, not a fix. Present the case — the user decides what to do.**
 
 ## The Three Minds
 
-Three investigative lenses. Not roleplay — reasoning frameworks that each unlock a different class of problems:
+Three investigative lenses — reasoning frameworks that each unlock a different class of problems:
 
-**Sherlock Holmes** — Deductive elimination. Deduce what MUST be true for something to work correctly, then verify each premise. "When you have eliminated the impossible, whatever remains, however improbable, must be the truth." Catches structural problems: logic errors, broken invariants, impossible states, type mismatches.
+**Sherlock Holmes** — Deductive elimination. What MUST be true? Verify each premise. Catches: logic errors, broken invariants, impossible states, type mismatches.
 
-**Hercule Poirot** — Psychological method. Study the author's intent and mental model. "It is the brain, the little grey cells, on which one must rely." Sees the gap between what someone THOUGHT the system does and what it ACTUALLY does. Misunderstood APIs, wrong assumptions, subtle misreads.
+**Hercule Poirot** — Psychological method. Study intent and mental model. The gap between what someone THOUGHT the system does and what it ACTUALLY does. Catches: misunderstood APIs, wrong assumptions, subtle misreads.
 
-**Columbo** — Persistent nagging. Something doesn't sit right. "Just one more thing..." Catches what's MISSING — the error handler that should be there, the edge case nobody considered, the test that doesn't exist, the cleanup that never happens.
-
-All three work the same case. Each sees what the others miss.
-
-## Polarities
-
-`/investigate` adapts to what you're investigating:
-
-| Polarity | Focus | Example Trigger |
-|----------|-------|----------------|
-| **Code** | Bugs, logic errors, type mismatches, broken flows | `/investigate` on a diff or file path |
-| **Performance** | Slow queries, memory leaks, bottlenecks, scaling issues | "Why is this slow?" |
-| **Architecture** | Pattern violations, coupling, dependency issues, design drift | "Is this the right structure?" |
-| **Data** | Integrity issues, schema problems, migration risks, inconsistencies | "The data doesn't look right" |
-| **System** | Infrastructure, networking, deployment, runtime failures | "Something is broken in production" |
-
-**Auto-detected from context.** If you provide a diff, it's a code investigation. If you describe a performance problem, it's performance. You can also specify: `/investigate performance why is the scoring endpoint slow?`
+**Columbo** — Persistent nagging. Something doesn't sit right. "Just one more thing..." Catches what's MISSING — error handlers, edge cases, tests, cleanup.
 
 ## Common Rationalizations
 
 | Shortcut | Why It Fails | The Cost |
 |----------|-------------|----------|
 | "Jump to Phase 5 — I already know the answer" | Skipping evidence gathering confirms biases, not bugs | Wrong diagnosis → wrong fix → problem persists |
-| "This code looks fine, move on" | Dangerous bugs LOOK correct — that's what makes them dangerous | The bug you didn't investigate is the one that ships |
-| "Not my scope — skip it" | Evidence trails cross boundaries; stopping at an arbitrary line misses root causes | Surface symptom fixed, root cause remains |
-| "The tests pass, so it's correct" | Tests test what the author THOUGHT the code does, not what it ACTUALLY does | False confidence → undetected regression |
+| "This code looks fine, move on" | Dangerous bugs LOOK correct | The bug you didn't investigate ships |
+| "Not my scope — skip it" | Evidence trails cross boundaries | Surface symptom fixed, root cause remains |
+| "The tests pass, so it's correct" | Tests test what the author THOUGHT, not what it ACTUALLY does | False confidence |
 
-## Method
+---
 
-**Auto-load relevant knowledge based on investigation context:**
-- Code polarity + `.py` files → Read `../knowledge/python-fastapi-patterns.md`
-- Code polarity + `.ts`/`.tsx` files → Read `../knowledge/typescript-nextjs-patterns.md`
-- System polarity → Read `../knowledge/infrastructure-ops.md` + `../knowledge/observability.md`
-- Performance polarity → Read `../knowledge/observability.md` + relevant stack knowledge
+## Phase 0: Establish the Case
+
+**Entry:** User described a problem, pointed at code, or said "something's wrong."
+
+**Auto-detect polarity from context:**
+
+| Signals | Polarity | Focus |
+|---------|----------|-------|
+| Diff, file path, error in code | **Code** | Bugs, logic errors, type mismatches |
+| "Slow", latency, timeouts | **Performance** | Queries, memory, bottlenecks |
+| "Is this the right structure" | **Architecture** | Patterns, coupling, design drift |
+| "Data doesn't look right" | **Data** | Integrity, schema, migration risks |
+| "Something is broken in prod" | **System** | Infrastructure, networking, runtime |
+
+**If unclear:** Use **AskUserQuestion** to ask: "What are we investigating? A code bug, performance issue, architecture concern, data problem, or system failure?"
+
+**Auto-load relevant knowledge:**
+- Code + `.py` → Read `../knowledge/python-fastapi-patterns.md`
+- Code + `.ts`/`.tsx` → Read `../knowledge/typescript-nextjs-patterns.md`
+- System → Read `../knowledge/infrastructure-ops.md` + `../knowledge/observability.md`
+- Performance → Read `../knowledge/observability.md` + relevant stack knowledge
 - Security-related → Read `../knowledge/security-review.md`
-- Also search the project's `docs/operators/runbooks/` for matching runbooks when investigating system issues
 
-Load the knowledge BEFORE starting the investigation. Apply its patterns alongside the detective methodology.
+**Also:** Search the project's `docs/operators/runbooks/` for matching runbooks when investigating system issues.
 
-### Phase 1: Survey the Scene (Poirot)
+**Exit:** Polarity determined, knowledge loaded, evidence available.
+
+---
+
+## Phase 1: Survey the Scene (Poirot)
 
 *"I do not leap to the conclusions. First, I observe."*
 
-**Entry:** Full evidence available (diff, file paths, error logs, or system description).
-**Exit:** Mental model understood — you can articulate what the system/code intends to do.
+**Entry:** Evidence available (diff, files, error logs, system description).
 
 Understand the full picture before analyzing:
 - What is happening? What SHOULD be happening?
-- What is the author's/system's mental model? What do they believe about the system?
+- What is the author's/system's mental model? What do they believe?
 - What assumptions are being made — are they warranted?
 - Does the evidence tell a coherent story, or are there contradictions?
 
-### Phase 2: Examine the Evidence (Holmes)
+**Exit:** Mental model understood — you can articulate what the system intends to do.
+
+---
+
+## Phase 2: Examine the Evidence (Holmes)
 
 *"It is a capital mistake to theorize before one has data."*
 
-**Entry:** Mental model from Phase 1 established.
-**Exit:** All premises listed and verified; trails followed to resolution or dead end.
+**Entry:** Mental model from Phase 1.
 
 Apply deductive reasoning:
 - What MUST be true for this to work correctly? List the premises.
 - What patterns do you observe? What's consistent? What breaks pattern?
-- Are the components telling a coherent story?
 
 **Follow the trail.** When something catches your eye, trace it:
 - Where does this data come from? Where does it go?
 - What calls this? What does this call?
-- Are the types/contracts flowing correctly through the chain?
+- Are types/contracts flowing correctly through the chain?
 
 Eliminate the impossible: if a value can be null here and there's no null check, that's not suspicion — it's a deduction.
 
-### Phase 3: Interview the Witnesses (Poirot)
+**Exit:** All premises listed and verified; trails followed to resolution or dead end.
+
+---
+
+## Phase 3: Interview the Witnesses (Poirot)
 
 *"Every witness tells you something — even when they lie."*
 
-**Entry:** Surrounding context identified from Phase 2 trails.
-**Exit:** Tests, types, and callers reviewed — story is consistent or contradictions documented.
+**Entry:** Trails identified from Phase 2.
 
-Study the surrounding context:
-- Do the tests actually test what this does, or what the author WISHES it does?
-- Do the types/schemas tell the same story as the implementation?
+Study surrounding context:
+- Do tests actually test what this does, or what the author WISHES it does?
+- Do types/schemas tell the same story as the implementation?
 - Does the API contract match what callers expect?
 - Is there a mismatch between how existing code uses an interface and how new code provides it?
 
-### Phase 4: Just One More Thing (Columbo)
+**Exit:** Tests, types, and callers reviewed — story is consistent or contradictions documented.
 
-*"Oh, I'm sorry to bother you again, but there's just one more thing that's been nagging at me..."*
+---
 
-**Entry:** Core analysis from Phases 2-3 complete.
-**Exit:** "Missing things" catalog complete — every absence documented with a concrete failure scenario.
+## Phase 4: Just One More Thing (Columbo)
+
+*"Oh, I'm sorry to bother you again, but there's just one more thing..."*
+
+**Entry:** Core analysis complete.
 
 The most important phase. Look for what's MISSING:
 - Error cases not handled
@@ -127,16 +145,19 @@ The most important phase. Look for what's MISSING:
 - Logging/monitoring for operations that can fail silently
 - Rollback paths for irreversible operations
 
-Keep nagging. The thing that seems like a minor detail is often the whole case.
+Keep nagging. The thing that seems minor is often the whole case.
 
-### Phase 5: Connect the Evidence (Holmes)
+**Exit:** "Missing things" catalog complete — every absence documented with a failure scenario.
+
+---
+
+## Phase 5: Connect the Evidence (Holmes)
 
 *"The game is afoot."*
 
 **Entry:** All phases 1-4 complete.
-**Exit:** Findings synthesized with evidence; every finding has a certainty level and concrete failure scenario.
 
-Synthesize. The problems that matter most hide at intersections:
+Synthesize. Problems hide at intersections:
 - A type says one thing, the runtime does another
 - A function is async but its caller doesn't await
 - A database column is NOT NULL but the API doesn't validate
@@ -145,27 +166,16 @@ Synthesize. The problems that matter most hide at intersections:
 
 Each finding must survive the Holmes test: given the evidence, is there any other explanation?
 
-## Rules of Investigation
+**Exit:** Findings synthesized with evidence.
 
-1. **Never accuse without evidence.** Every finding cites specific location and explains WHY with a concrete scenario.
-2. **Distinguish certainty.** Three levels only:
-   - **Conclusive** — This WILL cause a problem. Here's the proof.
-   - **Suspicious** — This looks wrong. Here's what could go wrong.
-   - **Warrants investigation** — Can't prove it from here, but someone should check.
-3. **Follow trails, don't scan categories.** If examining a query leads to a missing index, follow that.
-4. **The most dangerous bugs look correct.** Focus on what LOOKS right but isn't.
-5. **Assumptions are suspects.** When someone assumed something is always true, check if it is.
+---
 
-## What You Ignore
+## Phase 6: Present the Case Report
 
-- Style nitpicks — that's what linters are for
-- Suggestions that aren't problems — unless the current state has a defect
-- Hypothetical future problems — only real, present danger
-
-## Case Report
+**Entry:** Findings synthesized.
 
 ```markdown
-## Case: [Brief title of what was investigated]
+## Case: [Brief title]
 
 ### Scene Assessment
 [2-3 sentences: what's happening, the mental model, initial impression]
@@ -173,43 +183,65 @@ Each finding must survive the Holmes test: given the evidence, is there any othe
 ### Findings
 
 #### [CONCLUSIVE] Finding title
-**Evidence:** [location] — [quote the relevant evidence]
-**Deduction:** [Why this is definitely a problem, with concrete failure scenario]
+**Evidence:** [location] — [quote the evidence]
+**Deduction:** [Why this IS a problem, with concrete failure scenario]
 **Impact:** [What happens when this fails]
 
 #### [SUSPICIOUS] Finding title
-**Evidence:** [location] — [quote the relevant evidence]
+**Evidence:** [location] — [quote the evidence]
 **Deduction:** [Why this looks wrong, what could go wrong]
 **Recommendation:** [What to verify or fix]
 
 #### [INVESTIGATE] Finding title
-**Evidence:** [location] — [quote the relevant evidence]
+**Evidence:** [location] — [quote the evidence]
 **Concern:** [What might be wrong but can't be proven from here]
 **Question:** [What should be verified]
 
 ### Just One More Thing...
 [Columbo's parting observations — what SHOULD be here but isn't.
-Missing tests, absent error handling, unguarded edge cases.
 Each with a concrete scenario of what goes wrong.]
 
 ### Case Summary
 **Verdict:** CLEAN / MINOR CONCERNS / BUGS FOUND / CRITICAL ISSUES
-**Confidence:** [How thoroughly you were able to investigate given the scope]
+**Confidence:** [How thoroughly investigated given the scope]
 [1-2 sentence overall assessment]
 ```
 
-## Adapting to Scope
+**Exit:** Case report presented.
 
-- **Small scope (< 50 lines, single component):** Go deep. Trace every flow. Read all callers.
-- **Medium scope (50-300 lines, few components):** Focus on the riskiest areas. Follow 2-3 trails.
-- **Large scope (300+ lines, system-wide):** Prioritize new logic, state changes, and boundaries. Flag areas that deserve deeper investigation.
+---
 
-## What Makes This Superpowered
+## Phase 7: Handoff
 
-- **Critical Trust (2.1):** Calibrated certainty. Three levels of confidence, never faking it.
-- **Task Decomposition (2.3):** Complex investigations broken into phased methodology.
-- **Strategic AI Dialogue (2.4):** The detective asks the questions others forgot. It's the thinking partner that pushes back.
-- **Universal.** Code, performance, architecture, data, systems — same methodology, different evidence.
+**Entry:** Case report presented.
+
+Use **AskUserQuestion** to present options:
+
+**Question:** "Investigation complete. What would you like to do?"
+
+**Options:**
+1. **Fix the issues** — Start implementing fixes (will exit investigation mode)
+2. **Dig deeper** — Investigate a specific finding further
+3. **Document findings** — Run `/compound` to capture this for future reference
+4. **Done** — Investigation sufficient
+
+**If user selects "Dig deeper":** Use **AskUserQuestion** to ask which finding, then return to Phase 2 focused on that trail. Present updated case report when done.
+
+---
+
+## Rules of Investigation
+
+1. **Never accuse without evidence.** Every finding cites location and explains WHY with a scenario.
+2. **Distinguish certainty.** CONCLUSIVE (will cause a problem), SUSPICIOUS (looks wrong), INVESTIGATE (can't prove from here).
+3. **Follow trails, don't scan categories.** If a query leads to a missing index, follow that.
+4. **The most dangerous bugs look correct.** Focus on what LOOKS right but isn't.
+5. **Assumptions are suspects.** Check if they're actually true.
+
+## What You Ignore
+
+- Style nitpicks — linters handle those
+- Suggestions that aren't problems
+- Hypothetical future problems — only present danger
 
 ## Validate
 
@@ -218,11 +250,16 @@ Before delivering the case report, verify:
 - [ ] Every finding cites a specific location and concrete failure scenario
 - [ ] Certainty levels are calibrated — not everything is CONCLUSIVE
 - [ ] "Just One More Thing" section exists with at least one missing-thing observation
-- [ ] The verdict matches the findings (don't say CLEAN if you found SUSPICIOUS items)
-- [ ] Confidence reflects actual investigation depth, not false certainty
+- [ ] Verdict matches the findings
+- [ ] No code was modified — read-only investigation
+
+## What Makes This Superpowered
+
+- **Critical Trust (2.1):** Calibrated certainty. Three levels, never faking it.
+- **Task Decomposition (2.3):** Complex investigations broken into phased methodology.
+- **Strategic AI Dialogue (2.4):** The detective asks the questions others forgot.
 
 ## Knowledge References
 
 - `../knowledge/critical-evaluation.md` — Evidence types, uncertainty flagging
-- `../knowledge/decision-frameworks.md` — Stakes matrix for prioritizing investigation depth
-- `../agents/investigator.md` — The agent that runs investigations autonomously
+- `../knowledge/decision-frameworks.md` — Prioritizing investigation depth

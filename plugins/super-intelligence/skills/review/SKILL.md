@@ -11,54 +11,55 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
+  - AskUserQuestion
   - Bash
 ---
 
 # Review
 
-One focused review. Not nine shallow passes — one deep one that reads carefully, evaluates with evidence, and gives a clear verdict. Works on code, documents, and architecture.
+One focused review. Not nine shallow passes — one deep one that reads carefully, evaluates with evidence, and gives a clear verdict.
+
+## Boundaries
+
+**This skill MAY:** read code, analyze diffs, read documents, present findings.
+**This skill MAY NOT:** edit code, fix issues, create PRs, push changes, modify any files.
+
+**This is a review, not a fix. Present findings — the user decides what to do.**
 
 ## Common Rationalizations
 
 | Shortcut | Why It Fails | The Cost |
 |----------|-------------|----------|
-| "Skim the diff — I'll catch the important stuff" | The one line you skip is the one that matters. Dangerous bugs look correct. | Bug in production that a careful read would have caught |
+| "Skim the diff — I'll catch the important stuff" | The one line you skip is the one that matters | Bug in production that a careful read would have caught |
 | "No security concerns here" | Auth checks, input validation, and secrets leak through seemingly innocent code | Vulnerability shipped because nobody looked |
-| "The tests pass, so the logic is correct" | Tests verify what the author THOUGHT the code does, not edge cases they missed | False confidence → undetected regression |
-| "Just style nits — not worth mentioning" | Mixing style nits with real findings buries critical issues | Author reads 10 nits, misses the 1 security bug |
+| "The tests pass, so the logic is correct" | Tests verify what the author THOUGHT, not edge cases they missed | False confidence → undetected regression |
+| "Just style nits — not worth mentioning" | Mixing nits with real findings buries critical issues | Author reads 10 nits, misses the 1 security bug |
 
-## Workflow
+---
 
-**Quick routing:** What kind of review is this?
-
-| What You're Given | Review Type | Action |
-|-------------------|------------|--------|
-| Branch diff, PR, or code files | **Code review** | Launch strategic-reviewer agent |
-| `.md` file in `docs/plans/` or `docs/brainstorms/` | **Document review** | Read and evaluate against document criteria |
-| Directory path | **Architecture review** | Analyze patterns, conventions, dependencies |
-| Unclear | Ask once: "Reviewing code or the document itself?" | |
-
-### 1. Detect Review Type
+## Phase 1: Detect Review Type
 
 **Entry:** User invoked `/review` with input (or no input = current branch diff).
-**Exit:** Review type determined — code, document, or architecture.
 
-Auto-detect what's being reviewed based on the input:
+Auto-detect based on input:
 
-| Input | Review Type | Approach |
-|-------|------------|----------|
+| Input | Review Type | How |
+|-------|------------|-----|
 | No arguments | **Code** — current branch diff | `git diff $(git merge-base HEAD main)..HEAD` |
-| File path to `.md` in `docs/plans/`, `docs/brainstorms/` | **Document** — plan or brainstorm | Read and evaluate against document criteria |
+| File path to `.md` in docs/plans/ or docs/brainstorms/ | **Document** | Read and evaluate against document criteria |
 | File path to code files | **Code** — specific files | Read and review those files |
 | PR URL or number | **Code** — PR diff | `gh pr diff <number>` |
 | Directory path | **Architecture** — structural review | Analyze patterns, conventions, dependencies |
 
-**If ambiguous:** Ask once. "Reviewing code changes or the document itself?"
+**If ambiguous:** Use **AskUserQuestion** to ask: "Reviewing code changes or the document itself?"
 
-### 2. Gather Context
+**Exit:** Review type determined — code, document, or architecture.
+
+---
+
+## Phase 2: Gather Context
 
 **Entry:** Review type known.
-**Exit:** Conventions loaded, risk areas identified, related plan/brainstorm read.
 
 **Auto-load relevant knowledge based on file types in the diff:**
 - `.py` files → Read `../knowledge/python-fastapi-patterns.md`
@@ -68,82 +69,71 @@ Auto-detect what's being reviewed based on the input:
 - `.github/` or `Dockerfile` → Read `../../super-creation/knowledge/ci-cd-patterns.md`
 - Auth/security-related code → Read `../knowledge/security-review.md`
 
-Load the knowledge BEFORE starting the review. The patterns in these files supplement your base review methodology.
+**Load the knowledge BEFORE starting the review.**
 
-Before reviewing, understand what "correct" looks like:
+Then gather project context:
+1. Read the project's CLAUDE.md for conventions
+2. Check what the change touches — auth, scoring, data, migrations, money → extra scrutiny
+3. Read the related plan or brainstorm if referenced in commits or PR description
+4. Note what's tested and what's not in the diff
 
-1. **Read the project's CLAUDE.md** for conventions and patterns
-2. **Check what the change touches.** Auth, scoring, data, migrations, money → extra scrutiny
-3. **Read the related plan or brainstorm** if referenced in commits or PR description
-4. **Check for test files** in the diff. Note what's tested and what's not.
+**Exit:** Conventions loaded, risk areas identified, related context read.
 
-### 3. Review
+---
+
+## Phase 3: Review
 
 **Entry:** Context gathered, diff/document available.
-**Exit:** Findings documented with evidence and severity.
+
+### For Code Reviews
 
 **Auto-route to specialized reviewer based on diff content:**
-- \>70% `.py` files → launch **python-reviewer** agent (instead of strategic-reviewer)
-- \>70% `.ts`/`.tsx` files → launch **typescript-reviewer** agent
-- Security-sensitive changes (auth, secrets, validation) → launch **security-reviewer** agent (in addition to stack reviewer)
-- Infrastructure files (`.tf`, `.yaml`, Helm, k8s) → launch **infra-reviewer** agent
-- Performance-tagged or query-heavy changes → launch **performance-reviewer** agent
-- Mixed or unclear → launch **strategic-reviewer** (generalist, the default)
 
-**If unsure which reviewer:** Use strategic-reviewer. One good review beats a wrong specialist. The strategic-reviewer also handles code reviews with loaded knowledge — it doesn't need a specialist for every PR.
+| Diff Composition | Reviewer Agent | Why |
+|------------------|---------------|-----|
+| >70% `.py` files | Task python-reviewer(diff + conventions) | Python-specific patterns |
+| >70% `.ts`/`.tsx` files | Task typescript-reviewer(diff + conventions) | TypeScript-specific patterns |
+| Security-sensitive (auth, secrets, validation) | Task security-reviewer(diff + conventions) | OWASP, threat modeling — **in addition to** stack reviewer |
+| Infrastructure (`.tf`, `.yaml`, Helm, k8s) | Task infra-reviewer(diff + conventions) | IaC-specific checks |
+| Performance-tagged or query-heavy | Task performance-reviewer(diff + conventions) | N+1, complexity, scaling |
+| Mixed or unclear | Task strategic-reviewer(diff + conventions) | Generalist — the default |
 
-#### Code Review
+**If unsure which reviewer:** Use strategic-reviewer. One good review beats a wrong specialist.
 
-Launch the **strategic-reviewer** agent with:
-- The full diff (or file contents)
-- Project conventions from CLAUDE.md
-- Any plan/brainstorm context
-- What areas the change touches (for priority calibration)
+**If the diff is large (>500 lines):** Focus on the most impactful files first. Read all, but prioritize findings from core logic over boilerplate or generated code.
 
-The agent does one focused review pass. No parallel swarm. One reviewer that does the job well.
+### For Document Reviews
 
-**If the diff is large (>500 lines):** Focus on the most impactful files first. Read all of them, but prioritize findings from core logic over boilerplate, tests, or generated code.
+Read the full document — don't skim. Evaluate against five criteria:
 
-#### Document Review
+1. **Does it explain WHY?** Decision rationale, not just "we'll use X."
+2. **Are risks identified?** What could go wrong? Mitigations?
+3. **Is the scope clear?** Explicit in/out of scope?
+4. **Are acceptance criteria measurable?** Testable? "Users can do X" not "the system is good."
+5. **Is it actionable?** Could someone start `/work` from this right now?
 
-Read the full document. Don't skim — read it once, thoroughly. Evaluate against these criteria:
+### For Architecture Reviews
 
-**Does it explain WHY?**
-- Is there decision rationale? Not just "we'll use X" but "we'll use X because Y, and we considered Z."
-- Are there decisions made without explanation? Flag each one.
+Analyze the directory/codebase structure:
+- Pattern consistency (do similar things follow similar patterns?)
+- Coupling and dependencies (are boundaries clean?)
+- Convention adherence (does it match CLAUDE.md?)
 
-**Are risks identified?**
-- Does it acknowledge what could go wrong? Are mitigations proposed?
-- Are there risks the author missed? (Security, performance, backward compatibility, data migration, cross-team dependencies)
+**Exit:** Findings documented with evidence and severity.
 
-**Is the scope clear?**
-- Can you tell exactly what's in scope and what's not?
-- Is there an explicit "out of scope" or "deferred" section?
+---
 
-**Are acceptance criteria measurable?**
-- Can you determine from the criteria alone whether the feature is complete?
-- Are criteria testable? "Users can do X" is testable. "The system is fast" is not.
-
-**Are there unresolved blockers?**
-- Open questions that should be answered before work begins?
-- TBD or TODO items that would block implementation?
-
-**Is it actionable?**
-- Could someone start `/work` from this document right now?
-- Are dependencies between tasks clear?
-
-### 4. Present Findings
+## Phase 4: Present Findings
 
 **Entry:** Review complete with findings.
-**Exit:** Findings presented in structured format with clear verdict.
 
-**For code reviews:**
+### Code Review Format
 
 ```markdown
 ## Review: [scope summary]
 
 ### Critical Issues (must fix)
-- **[CRIT-1]** [file:line] — Description. Why this matters. Fix suggestion.
+- **[CRIT-1]** [file:line] — Description. Evidence. Failure scenario. Fix suggestion.
 
 ### Suggestions (consider)
 - **[SUG-1]** [file:line] — Description. Tradeoff if ignored.
@@ -154,69 +144,82 @@ Read the full document. Don't skim — read it once, thoroughly. Evaluate agains
 ### Verdict: APPROVE / APPROVE WITH NOTES / REQUEST CHANGES
 ```
 
-**Confidence requirement:** Every finding needs [evidence] + [failure scenario]. No evidence = no finding. "This looks off" is not a finding. "This will fail when X because Y" is.
+**Every finding needs:** [evidence] + [failure scenario]. No evidence = no finding. "This looks off" is not a finding. "This will fail when X because Y" is.
 
-**For document reviews:**
+### Document Review Format
 
 ```markdown
 ## Document Review: [filename]
 
 ### Strengths
-- [What's well done — be specific, not generic praise]
+- [What's well done — specific, not generic praise]
 
 ### Gaps
-- [GAP-1] [What's missing or unclear] — Why this matters for implementation.
+- [GAP-1] What's missing — why this matters for implementation.
 
 ### Suggestions
-- [SUG-1] [Specific improvement] — How this makes the document more actionable.
+- [SUG-1] Specific improvement — how this makes the doc more actionable.
 
 ### Verdict: READY / NEEDS REFINEMENT
-
-[1-2 sentence summary. If NEEDS REFINEMENT, name the top 1-3 things to fix before starting work.]
+[1-2 sentence summary. If NEEDS REFINEMENT, name the top 1-3 things to fix.]
 ```
 
 **If no issues found:** Say so clearly. Don't invent problems.
 
-### 5. Bridge to Knowledge Compounding
+**Exit:** Findings presented in structured format with clear verdict.
 
-If the review uncovered a non-obvious pattern, gotcha, or insight worth preserving:
+---
 
-```
->> This review found [insight]. Worth documenting for the team? /compound
-```
+## Phase 5: Handoff
 
-Only suggest when genuinely useful. Most reviews don't produce novel insights — that's fine.
+**Entry:** Findings presented.
 
-## What Makes This Superpowered
+Use **AskUserQuestion** to present options:
 
-- **Critical Trust (2.1):** The reviewer flags uncertainty. "I'm not sure about X — verify with Y" instead of faking confidence.
-- **One deep review > nine shallow ones.** One agent reading carefully produces signal. Nine agents skimming produce noise.
-- **Universal scope.** Code, documents, architecture — one skill, one deep pass. The detective doesn't care whether the evidence is code or prose.
-- **Knowledge compounding bridge.** Reviews aren't just quality gates — they're learning opportunities.
+**Question:** "Review complete. What would you like to do next?"
+
+**Options:**
+1. **Address findings** — Start fixing the issues (will exit review mode)
+2. **Discuss a finding** — Want to push back or get more detail on something
+3. **Document insights** — Run `/compound` to capture non-obvious patterns found
+4. **Done** — Review complete, move on
+
+**If user selects "Discuss a finding":** Discuss, then return to this choice.
+
+**If user selects "Document insights":** Suggest `/compound` with the specific insight.
+
+---
 
 ## Validate
 
 **After code review, verify:**
-- [ ] Did I check correctness? (logic errors, edge cases, broken invariants)
-- [ ] Did I check security? (auth, input validation, secrets, OWASP basics)
-- [ ] Did I check conventions? (project patterns, naming, structure)
-- [ ] Did I check simplicity? (YAGNI, unnecessary abstractions)
-- [ ] Did I check test coverage? (critical paths tested, not just happy path)
+- [ ] Checked correctness (logic errors, edge cases, broken invariants)
+- [ ] Checked security (auth, input validation, secrets, OWASP basics)
+- [ ] Checked conventions (project patterns, naming, structure)
+- [ ] Checked simplicity (YAGNI, unnecessary abstractions)
+- [ ] Checked test coverage (critical paths tested, not just happy path)
+- [ ] No files were modified — findings only
 
 **After document review, verify:**
-- [ ] Did I check WHY? (decision rationale, not just what)
-- [ ] Did I check risks? (what could go wrong, mitigations)
-- [ ] Did I check scope? (clear in/out of scope)
-- [ ] Did I check criteria? (measurable, testable acceptance criteria)
-- [ ] Did I check actionability? (can `/work` start from this?)
+- [ ] Checked WHY (decision rationale, not just what)
+- [ ] Checked risks (what could go wrong, mitigations)
+- [ ] Checked scope (clear in/out)
+- [ ] Checked criteria (measurable, testable)
+- [ ] Checked actionability (can `/work` start from this?)
 
 ## When NOT to Use /review
 
 - **Trivial changes.** Typo fixes, config updates, formatting. Just commit.
-- **Generated code.** Review the input, not the output. Migrations, lockfiles, etc.
-- **You just want a linter.** Run the linter instead. `/review` is for semantic review.
+- **Generated code.** Review the input, not the output.
+- **You just want a linter.** Run the linter instead.
+
+## What Makes This Superpowered
+
+- **Critical Trust (2.1):** Flags uncertainty. "I'm not sure about X — verify with Y" instead of faking confidence.
+- **One deep review > nine shallow ones.** Signal, not noise.
+- **Knowledge compounding bridge.** Reviews surface insights worth preserving via `/compound`.
 
 ## Knowledge References
 
-- `../knowledge/critical-evaluation.md` — How to evaluate with evidence and flag uncertainty
-- `../agents/strategic-reviewer.md` — The agent that does the actual code review
+- `../knowledge/critical-evaluation.md` — Evidence-based evaluation, uncertainty flagging
+- `../agents/strategic-reviewer.md` — The default code review agent

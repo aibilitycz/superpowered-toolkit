@@ -8,58 +8,75 @@ allowed-tools:
   - Read
   - Grep
   - Glob
+  - AskUserQuestion
   - Bash
 ---
 
 # Orchestrate
 
-The conductor. Detects where you are in the superpowered workflow, suggests the next phase, and ensures artifacts flow between plugins. This skill doesn't do the work — it routes to the right superpower.
+The conductor. Detects where you are in the superpowered workflow, suggests the next phase, ensures artifacts flow between plugins. This skill doesn't do the work — it routes to the right superpower.
+
+## Boundaries
+
+**This skill MAY:** scan for artifacts (read-only), present status, suggest next steps, route to other skills.
+**This skill MAY NOT:** edit code, write documents, execute plans, perform reviews. Routing only.
+
+**This skill routes. Other skills do.**
 
 ## The Full Loop
 
 ```
-/brainstorm (Super Perception)
+/brainstorm (Perception)
     ↓ writes: docs/brainstorms/YYYY-MM-DD-{topic}-brainstorm.md
-/plan (Super Intelligence)
+/plan (Intelligence)
     ↓ reads brainstorm, writes: docs/plans/YYYY-MM-DD-{topic}-plan.md
-/work (Super Creation)
-    ↓ reads plan, executes tasks, commits incrementally, ships (quality checks + push)
-/review (Super Intelligence)
-    ↓ reads changes, produces evidence-based review
-/compound (Super Knowledge)
-    ↓ captures solution: docs/solutions/{domain}/{topic}.md
+/work (Creation)
+    ↓ reads plan, executes tasks, commits, ships
+/review (Intelligence)
+    ↓ reads changes, produces findings
+/compound (Knowledge)
+    ↓ captures: docs/solutions/{domain}/{topic}.md
 ```
 
-Not every task needs the full loop. Small fixes skip brainstorm and plan. Medium tasks skip brainstorm. Only significant features run the complete cycle.
+Not every task needs the full loop. Match flow to task size.
 
-## Workflow
+---
 
-**Keyword routing — what the user says → what to suggest:**
+## Phase 0: Keyword Routing
 
-| User Says | Suggest |
-|-----------|---------|
+**Entry:** User invoked `/orchestrate` or used a keyword.
+
+**If the user's intent is clear, route immediately:**
+
+| User Says | Route To |
+|-----------|----------|
 | "I have an idea" / "what should we build" / "explore" | `/brainstorm` |
 | "plan this" / "how should we build" / "break this down" | `/plan` |
 | "let's build" / "start working" / "execute" / "implement" | `/work {plan-path}` |
 | "review this" / "check the code" / "is this ready" | `/review` |
 | "document this" / "save this fix" / "capture" | `/compound` |
-| "what's next" / "where are we" / "status" | Run the detect → assess flow below |
+| "what's next" / "where are we" / "status" | Continue to Phase 1 |
 
-### 1. Detect Current State
+**If intent matches a route:** Suggest the skill directly. Don't scan artifacts first.
 
-**Entry:** User invoked `/orchestrate` or asked "what's next?"
-**Exit:** Workflow artifacts scanned — brainstorms, plans, branches, solutions cataloged.
+**Exit:** Either routed to a skill, or continuing to artifact scan.
 
-Scan the project for workflow artifacts:
+---
+
+## Phase 1: Detect Current State
+
+**Entry:** User asked "what's next?" or intent is unclear.
+
+Scan for workflow artifacts:
 
 ```bash
 # Recent brainstorms (last 14 days)
 ls -la docs/brainstorms/*.md 2>/dev/null | tail -5
 
 # Active plans
-grep -rl "status: active" docs/plans/*.md 2>/dev/null
+grep -rl "status: approved\|status: in_progress" docs/plans/*.md 2>/dev/null
 
-# Current branch and uncommitted changes
+# Current branch and changes
 git status --short
 git log --oneline -5
 
@@ -67,27 +84,33 @@ git log --oneline -5
 ls -la docs/solutions/**/*.md 2>/dev/null | tail -5
 ```
 
-### 2. Assess Phase
+Check the project's `CLAUDE.md` for a "Toolkit Output Paths" table and use override paths if present.
+
+**Exit:** Artifacts cataloged.
+
+---
+
+## Phase 2: Assess Phase
 
 **Entry:** Artifacts scanned.
-**Exit:** Current phase identified with confidence.
-
-Based on what exists, determine where the user is:
 
 | Signals | Phase | Suggest |
 |---------|-------|---------|
-| No brainstorm, no plan, vague idea | **Discovery** | `/brainstorm` — explore the problem first |
-| Recent brainstorm, no plan | **Planning** | `/plan {brainstorm-path}` — turn decisions into a plan |
-| Active plan with unchecked tasks | **Execution** | `/work {plan-path}` — start building |
-| Active plan, all tasks checked | **Review** | `/review` — check the code before shipping |
-| Review complete, tests passing | **Finalize** | `/work` — finalize and push (shipping is step 7 of /work) |
-| Just shipped or fixed something non-trivial | **Compounding** | `/compound` — capture the solution |
-| Everything current is shipped | **Done** | No action needed. Start a new cycle when ready. |
+| No brainstorm, no plan, vague idea | **Discovery** | `/brainstorm` |
+| Recent brainstorm, no plan | **Planning** | `/plan {brainstorm-path}` |
+| Active plan with unchecked tasks | **Execution** | `/work {plan-path}` |
+| Active plan, all tasks checked | **Review** | `/review` |
+| Review complete, tests passing | **Ship** | Push and finalize |
+| Just shipped or fixed something non-trivial | **Compounding** | `/compound` |
+| Everything shipped | **Done** | No action needed |
 
-### 3. Present Status and Recommendation
+**Exit:** Phase identified.
+
+---
+
+## Phase 3: Present Status
 
 **Entry:** Phase assessed.
-**Exit:** Status and recommendation presented to user.
 
 ```markdown
 ## Workflow Status
@@ -100,55 +123,59 @@ Based on what exists, determine where the user is:
 - Uncommitted changes: {yes/no}
 
 **Recommended next step:** {command with path}
-**Why:** {one sentence reasoning}
-
-**Alternative:** {if there's a reasonable alternative}
+**Why:** {one sentence}
 ```
 
-### 4. Route to the Right Superpower
+Use **AskUserQuestion** to present options:
 
-**Entry:** User chose a next step.
-**Exit:** User guided to the correct skill with the right arguments.
+**Question:** "Here's where things stand. What would you like to do?"
 
-After the user chooses:
-- Guide them to invoke the right skill
-- Provide the correct argument (e.g., the brainstorm path for `/plan`)
-- Note any context the next skill should know
+**Options:**
+1. **{Recommended action}** — {why this is the logical next step}
+2. **Something else** — Tell me what you'd like to do instead
+3. **Start fresh** — Begin a new workflow cycle
+
+**If user selects the recommendation:** Guide them to invoke the right skill with the right arguments.
+
+**If user selects "Something else":** Use **AskUserQuestion** to ask what they want to do, then route to the matching skill.
+
+**Exit:** User routed to the right skill.
+
+---
 
 ## Partial Flows
-
-Not everything needs the full loop:
 
 | Task Size | Recommended Flow |
 |-----------|-----------------|
 | **Trivial** (typo, config) | Just fix it. No workflow needed. |
-| **Small** (< 1 hour, clear scope) | `/work` → commit. Skip brainstorm, plan, and review. |
+| **Small** (< 1 hour, clear scope) | `/work` → commit |
 | **Medium** (1-3 days, clear approach) | `/plan` → `/work` → `/review` |
-| **Large** (multi-day, unclear approach) | Full loop: `/brainstorm` → `/plan` → `/work` → `/review` → `/compound` |
-| **Exploration** (no clear goal yet) | `/brainstorm` only. Decide next steps after. |
+| **Large** (multi-day, unclear approach) | `/brainstorm` → `/plan` → `/work` → `/review` → `/compound` |
+| **Exploration** (no clear goal) | `/brainstorm` only |
 
-## Cross-Plugin Conventions
+## Cross-Plugin Artifact Conventions
 
 How plugins find each other's artifacts:
 
-| Artifact | Location | Frontmatter |
-|----------|----------|-------------|
-| Brainstorm | `docs/brainstorms/YYYY-MM-DD-{topic}-brainstorm.md` | `type: brainstorm`, `related:` |
-| Plan | `docs/plans/YYYY-MM-DD-{type}-{topic}-plan.md` | `type: {feat\|fix\|...}`, `status: active`, `brainstorm:` |
-| Solution | `docs/solutions/{domain}/{topic}.md` | `domain:`, `symptoms:`, `root_cause:` |
+| Artifact | Default Location | Key Frontmatter |
+|----------|-----------------|-----------------|
+| Brainstorm | `docs/brainstorms/YYYY-MM-DD-{topic}-brainstorm.md` | `type: brainstorm` |
+| Plan | `docs/plans/YYYY-MM-DD-{type}-{topic}-plan.md` | `type: plan`, `status:`, `brainstorm:` |
+| Solution | `docs/solutions/{domain}/{topic}.md` | `type: solution`, `domain:`, `symptoms:` |
 
-**The `related:` field** in frontmatter is how artifacts link across phases. A plan's `brainstorm:` field points to its brainstorm. A solution's `related:` field points to the plan that generated it.
+The `related:` field links artifacts across phases. A plan's `brainstorm:` points to its brainstorm. A solution's `related:` points to the plan.
+
+Projects can override these paths — see CONVENTIONS.md "Output Artifacts" section.
 
 ## What Makes This Superpowered
 
-- **Workflow Orchestration (5.2):** This IS workflow orchestration — routing work through the right tools at the right time.
-- **Augmentation Vision (5.1):** The status view shows how human + AI collaboration works across the full lifecycle.
-- **Process Decomposition (5.3):** Breaking complex projects into plugin-appropriate phases.
-- **The compound effect:** When the full loop completes, the knowledge captured makes the next loop faster. Orchestrate makes this visible.
+- **Workflow Orchestration (5.2):** Routing work through the right tools at the right time.
+- **Augmentation Vision (5.1):** Status view shows human + AI collaboration across the lifecycle.
+- **Process Decomposition (5.3):** Breaking projects into plugin-appropriate phases.
+- **The compound effect:** When the full loop completes, knowledge captured makes the next loop faster.
 
 ## Anti-patterns
 
-- **Orchestrating trivial tasks.** Don't run the full loop for a typo fix. Use judgment.
-- **Auto-advancing.** Never auto-advance between phases. The human decides when to move forward.
-- **Forcing the full loop.** Partial flows are fine. Not every task needs brainstorming.
-- **Orchestrating without other plugins.** This skill needs the other superpowers installed. Without them, it's just suggestions.
+- **Orchestrating trivial tasks.** Don't run the full loop for a typo.
+- **Auto-advancing.** Never auto-advance between phases. The human decides.
+- **Forcing the full loop.** Partial flows are fine.

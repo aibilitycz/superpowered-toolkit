@@ -10,99 +10,134 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
+  - AskUserQuestion
   - Write
   - Edit
-  - Bash
 ---
 
 # Plan
 
-Strategic planning that fits the problem. Simple features get concise plans. Complex work gets detailed plans with alternatives, risks, and phased implementation. Every plan explains WHY — not just WHAT.
+Strategic planning that fits the problem. Answers **HOW** to build what was decided in `/brainstorm` (or from scratch for clear requirements).
+
+## Boundaries
+
+**This skill MAY:** research (read-only), analyze codebase patterns, write the plan document.
+**This skill MAY NOT:** edit code, create files beyond the plan document, run tests, deploy, implement anything.
+
+**NEVER write code during this skill. Research and plan only.**
 
 ## Common Rationalizations
 
 | Shortcut | Why It Fails | The Cost |
 |----------|-------------|----------|
-| "Skip research — I already know the codebase" | You know YOUR mental model. The codebase may have changed, or patterns you haven't seen. | Plan conflicts with existing code → rework |
-| "Skip decision rationale — the approach is obvious" | Obvious to you, now. Not to the person executing in 2 weeks, or to future-you debugging. | Decisions get questioned, re-litigated, or silently reversed |
+| "Skip research — I already know the codebase" | You know YOUR mental model. The codebase may have changed. | Plan conflicts with existing code → rework |
+| "Skip decision rationale — the approach is obvious" | Obvious to you, now. Not to the person executing in 2 weeks. | Decisions get questioned, re-litigated, or silently reversed |
 | "Make every task detailed — more detail is better" | Over-specified plans are brittle. They break on first contact with reality. | Plan becomes a constraint instead of a guide |
-| "Skip risk analysis — it's low risk" | The risks you don't name are the ones that surprise you | Unmitigated risk → emergency debugging |
+| "Skip risk analysis — it's low risk" | The risks you don't name are the ones that surprise you. | Unmitigated risk → emergency debugging |
 
-## Workflow
+---
 
-### 1. Detect Context
+## Phase 0: Detect Context
 
 **Entry:** User has a topic, brainstorm path, or feature description.
-**Exit:** Context understood — brainstorm consumed (if exists), scope clear enough to research.
 
-**If the user provided a brainstorm path or topic:**
-- Read the brainstorm document
-- Extract key decisions, chosen approach, open questions
-- Announce: "Using brainstorm: [filename]. Extracting decisions."
+**If the user provided a brainstorm path:**
+1. Read the brainstorm document
+2. Extract key decisions, chosen approach, open questions
+3. Announce: "Using brainstorm: [filename]. Extracting decisions."
+4. **Skip Phase 1** — the brainstorm already answered WHAT to build
 
 **If the user provided a topic but no brainstorm:**
-- Check `docs/brainstorms/` for a recent match (last 14 days, semantic match on filename/frontmatter)
-- If found, read it and use as context
-- If multiple candidates, ask which one
+- Check `docs/brainstorms/` (or project override path) for a recent match (last 14 days, semantic match on filename/frontmatter)
+- **If one found:** Read it and announce. Skip Phase 1.
+- **If multiple found:** Use **AskUserQuestion** to ask which brainstorm to use, or whether to proceed without one.
+- **If none found:** Continue to Phase 1.
 
-**If no brainstorm and no clear topic:**
-- Ask 2-3 clarifying questions. Not a dialogue marathon — just enough to understand scope, purpose, and constraints.
-- Focus on: What problem does this solve? What's the desired outcome? Any constraints?
+**Exit:** Context understood — brainstorm consumed (if exists), scope clear enough to research.
 
-### 2. Research (One Focused Pass)
+---
 
-**Entry:** Context detected. Scope understood.
-**Exit:** Codebase patterns known, past solutions surfaced, constraints identified.
+## Phase 1: Refine the Idea (Only if No Brainstorm)
 
-Launch **one subagent** to gather context. Not four parallel agents — one pass that reads what matters.
+**Entry:** No brainstorm exists. User provided a topic or description.
 
-The subagent should:
-1. Read the project's `CLAUDE.md` for conventions and patterns
-2. Scan files relevant to the feature (grep for related code, read key files)
-3. Check `docs/solutions/` for past solutions that match this problem
-4. If a brainstorm exists, cross-reference its decisions
+Use **AskUserQuestion** to ask clarifying questions — one at a time, not a questionnaire:
+- What problem does this solve?
+- What's the desired outcome?
+- Any constraints? (time, tech, dependencies)
 
-**Surface past solutions:** If `docs/solutions/` has relevant entries, announce them:
+Prefer multiple-choice questions when natural options exist. Continue until the scope is clear OR user says "proceed."
+
+**Exit:** Scope understood well enough to research.
+
+---
+
+## Phase 2: Research
+
+**Entry:** Context detected (Phase 0) or idea refined (Phase 1).
+
+Launch research **in parallel**:
+
+- Task researcher("Find existing patterns related to: <feature description>. Search project CLAUDE.md for conventions, codebase for similar implementations, docs/solutions/ for past fixes, and docs/plans/ for related work.")
+
+**Surface past solutions:**
 ```
 >> Known pattern: docs/solutions/auth/jwt-refresh-fix.md (high match)
+>> Existing code: services/scoring-engine/composite.py (similar pattern)
 ```
 
-**No external research by default.** Only if the topic is genuinely unfamiliar AND the user approves. Most features don't need web searches — they need understanding of what already exists.
+**Research decision for external sources:**
 
-### 3. Calibrate Detail Level
+- **High-risk topics (security, payments, data privacy, migrations):** Always research externally. The cost of missing something is too high.
+- **Strong local context (codebase has patterns, CLAUDE.md has guidance):** Skip external research.
+- **Uncertain or unfamiliar territory:** Research externally.
+
+**If external research is needed:**
+Announce the decision and proceed: "This involves payment processing — researching current best practices before planning."
+
+**Exit:** Codebase patterns known, past solutions surfaced, constraints identified.
+
+---
+
+## Phase 3: Calibrate Detail Level
 
 **Entry:** Research complete.
-**Exit:** Detail level chosen and communicated to user.
 
-Auto-calibrate based on complexity. Don't ask the user to pick a detail level — assess it.
+Auto-calibrate based on complexity. Don't ask the user — assess it, then tell them.
 
 ```
-CONCISE plan — when:
+CONCISE — when:
 - Scope is clear and bounded
 - One person, one day or less
 - Low risk (no auth, scoring, data, money)
 - Clear precedent in codebase
 
-STANDARD plan — when:
+STANDARD — when:
 - Multi-day work but clear approach
 - Some risk or new patterns needed
 - Decision rationale adds value
 
-DETAILED plan — when:
+DETAILED — when:
 - Multi-repo or multi-team
 - Unclear approach, multiple valid options
 - High risk (auth, scoring, data, money, migrations)
 - Significant architectural decisions
 ```
 
-**Tell the user what you chose and why:** "This is a standard plan — multi-day work with a few decisions to document. Let me know if you want more or less detail."
+Tell the user: "This is a [level] plan — [reason]. Let me know if you want more or less detail."
 
-### 4. Write the Plan
+**Exit:** Detail level chosen and communicated.
+
+---
+
+## Phase 4: Write the Plan
 
 **Entry:** Detail level set, research findings available.
-**Exit:** Plan document written with tasks, rationale, and acceptance criteria.
 
-**Output path:** `docs/plans/YYYY-MM-DD-{type}-{kebab-topic}-plan.md`
+Check the project's `CLAUDE.md` for a "Toolkit Output Paths" table. Use those paths if present, otherwise use defaults.
+
+**Output path:** `{plans_path}/YYYY-MM-DD-{type}-{kebab-topic}-plan.md`
+(Default `plans_path`: `docs/plans/`)
 
 **Types:** `feat`, `fix`, `refactor`, `chore`, `docs`
 
@@ -110,58 +145,61 @@ DETAILED plan — when:
 ```yaml
 ---
 title: "{type}: {description}"
-type: {feat|fix|refactor|chore|docs}
-status: active
+type: plan
 date: YYYY-MM-DD
+status: approved
 brainstorm: {path if exists}
-repo: {GitHub URL if cross-repo}
-repo_path: {relative path if cross-repo}
+confidence: high | medium | low
 ---
 ```
 
-**Plan structure — all plans include:**
-
+**All plans include:**
 1. **Title and one-line summary**
 2. **Problem Statement** — What's wrong or missing? Why does this matter?
 3. **Proposed Solution** — High-level approach
 4. **Implementation Tasks** — Checkboxes with dependency ordering. These become the tracker for `/work`.
-5. **Acceptance Criteria** — How do we know it's done?
+5. **Acceptance Criteria** — How do we know it's done? Measurable, testable.
 
 **Standard and detailed plans also include:**
-
-6. **Decision Rationale** — Why this approach? What alternatives were considered? What are the tradeoffs?
-   - This is the core of strategic planning. A plan without "why" is a todo list.
+6. **Decision Rationale** — Why this approach? Alternatives considered? Tradeoffs?
 7. **Risk Analysis** — What could go wrong? How do we mitigate it?
 
 **Detailed plans also include:**
+8. **Phased Implementation** — Phases with exit criteria per phase
+9. **References** — Links to brainstorm, relevant code, past solutions
 
-8. **Phased Implementation** — Break into phases with exit criteria per phase
-9. **References** — Links to brainstorm, relevant code, past solutions, external docs
+**Confidence calibration (stated in frontmatter and body):**
+- **High:** Clear requirements + existing codebase patterns + bounded scope
+- **Medium:** Requirements understood but approach is new territory
+- **Low:** Unclear requirements, ambiguous scope, significant unknowns — flag these and suggest `/brainstorm` first
 
-### 5. Offer Next Steps
+**Exit:** Plan document written.
+
+---
+
+## Phase 5: Handoff
 
 **Entry:** Plan written and saved.
-**Exit:** User informed of next steps.
 
-After writing the plan:
+Use **AskUserQuestion** to present options:
 
-```
-Plan ready at docs/plans/YYYY-MM-DD-{type}-{topic}-plan.md
+**Question:** "Plan ready at `{path}`. What would you like to do next?"
 
-Options:
-- Review it and refine → I'll adjust based on your feedback
-- /review → structured evaluation before starting
-- /work → start implementing
-```
+**Options:**
+1. **Review and refine** — I'll adjust based on your feedback
+2. **Start implementation** — Run `/work` with this plan
+3. **Get a second opinion** — Run `/review` on the plan document
+4. **Done for now** — Return later
 
-## What Makes This Superpowered
+**If user selects "Review and refine":** Accept feedback, update the plan, then present these options again.
 
-This isn't a generic plan template. It models the Super Intelligence sub-competencies:
+**If user selects "Start implementation":** Suggest running `/work {plan-path}`.
 
-- **Task Decomposition (2.3):** Tasks are broken down with dependency ordering, not dumped as a flat list. The 90/10 split identifies what delivers most value first.
-- **Prompt Mastery (2.2):** The plan IS a well-structured prompt for `/work`. Clear enough that execution requires no guessing.
-- **Strategic AI Dialogue (2.4):** Decision rationale captures the reasoning process — not just the conclusion, but why alternatives were rejected.
-- **Critical Trust (2.1):** Risks are flagged honestly. If something is uncertain, the plan says so instead of projecting false confidence.
+**If user selects "Get a second opinion":** Suggest running `/review {plan-path}`.
+
+**If user selects "Done for now":** Confirm the path and remind: "To start later: `/work {plan-path}`"
+
+---
 
 ## Validate
 
@@ -170,24 +208,18 @@ Before delivering the plan, verify:
 - [ ] Tasks are dependency-ordered — not a flat, unordered list
 - [ ] Acceptance criteria are measurable — "users can do X" not "the system is good"
 - [ ] Decision rationale explains WHY, not just WHAT (for standard+ plans)
-- [ ] Someone new could start `/work` from this plan without asking clarifying questions
-- [ ] Plan confidence: **high** if codebase patterns exist, **medium** if new territory, **low** if unclear requirements — stated explicitly
+- [ ] Someone new could start `/work` from this plan without clarifying questions
+- [ ] Confidence level is stated and honest
+- [ ] No code was written — only the plan document was created
 
-## Confidence Calibration
+## What Makes This Superpowered
 
-State plan confidence explicitly in the plan document:
-- **High confidence:** Clear requirements + existing codebase patterns to follow + bounded scope
-- **Medium confidence:** Requirements understood but approach is new territory or involves tradeoffs
-- **Low confidence:** Unclear requirements, ambiguous scope, or significant unknowns — flag these and suggest `/brainstorm` first
-
-## Anti-patterns
-
-- **Planning to plan.** Don't over-research. One focused pass, then write. The plan can be refined.
-- **Template over substance.** Skip sections that add no value. A concise plan without risk analysis is fine if the risk is genuinely low.
-- **Task soup.** Tasks should be ordered and sized. "Implement the feature" is not a task. "Add the migration for X, then update model Y" is.
-- **Planning without context.** Always read the codebase first. Plans that ignore existing patterns waste time.
+- **Task Decomposition (2.3):** Tasks broken down with dependency ordering, not dumped as a flat list.
+- **Prompt Mastery (2.2):** The plan IS a well-structured prompt for `/work`. Clear enough that execution requires no guessing.
+- **Strategic AI Dialogue (2.4):** Decision rationale captures reasoning — not just conclusions, but why alternatives were rejected.
+- **Critical Trust (2.1):** Risks flagged honestly. If uncertain, the plan says so.
 
 ## Knowledge References
 
-- `../knowledge/decision-frameworks.md` — How to evaluate tradeoffs and decide fast vs. slow
+- `../knowledge/decision-frameworks.md` — How to evaluate tradeoffs
 - `../knowledge/strategic-decomposition.md` — How to break work into dependency-ordered steps
