@@ -30,6 +30,7 @@ superpowered-toolkit/
 | Plugin | Layer | Version | What It Does |
 |--------|-------|---------|-------------|
 | [psychometric-ai-toolkit](plugins/psychometric-ai-toolkit/) | MEASURE | 0.2.0 | 9 domain knowledge files, 3 skills, 2 agents for psychometric assessment science |
+| [super-intelligence](plugins/super-intelligence/) | BUILD | 0.1.0 | Strategic planning, focused code review, critical evaluation — 3 skills, 1 agent |
 
 ## Install
 

@@ -1,0 +1,21 @@
+{
+  "name": "super-intelligence",
+  "version": "0.1.0",
+  "description": "Strategic planning, focused code review, and critical evaluation — grounded in the Super Intelligence superpower.",
+  "author": {
+    "name": "aibility",
+    "url": "https://github.com/aibilitycz"
+  },
+  "homepage": "https://github.com/aibilitycz/superpowered-toolkit/tree/main/plugins/super-intelligence",
+  "repository": "https://github.com/aibilitycz/superpowered-toolkit",
+  "license": "MIT",
+  "keywords": [
+    "planning",
+    "code-review",
+    "critical-thinking",
+    "task-decomposition",
+    "decision-making",
+    "strategic-thinking",
+    "document-review"
+  ]
+}

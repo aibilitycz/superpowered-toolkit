@@ -76,6 +76,7 @@ Each plugin's `plugin.json` or `README.md` must declare:
 | Plugin | Primary Layer | Anchor | Rationale |
 |--------|--------------|--------|-----------|
 | `psychometric-ai-toolkit` | MEASURE | All 5 superpowers | Measurement science underpins every dimension score |
+| `super-intelligence` | BUILD | Superpower 2: Critical Trust, Prompt Mastery, Task Decomposition, Strategic AI Dialogue | Strategic thinking is the foundation for every workflow |
 | `sp-methodology` (planned) | GOVERN | Score components, archetypes, P1-P8 decisions | Defines the rules that plugins implement |
 | `assessment-builder` (future) | BUILD | L1+L2 pipeline, item bank | Implements the assessment flow from 08-assessment-design |
 | `coaching-advisor` (future) | DEVELOP | 20 sub-competencies | Maps gaps to growth paths per sub-competency |
@@ -142,8 +143,9 @@ Example: The psychometric toolkit recommends equal weights as the default compos
 | Phase | Plugin | Layer | Status |
 |-------|--------|-------|--------|
 | v0.2 | `psychometric-ai-toolkit` | MEASURE | Shipped |
-| v0.3 | `sp-methodology` | GOVERN | Planned — move from aimee-product |
-| v0.4 | Cursor converter | — | Planned — multi-environment support |
+| v0.3 | `super-intelligence` | BUILD | Shipped — strategic planning, review, critical evaluation |
+| v0.4 | `sp-methodology` | GOVERN | Planned — move from aimee-product |
+| v0.5 | Cursor converter | — | Planned — multi-environment support |
 | v1.0 | Official Anthropic marketplace submission | — | After v0.3 |
 | Future | `assessment-builder` | BUILD | Assessment config patterns |
 | Future | `coaching-advisor` | DEVELOP | Growth paths per sub-competency |

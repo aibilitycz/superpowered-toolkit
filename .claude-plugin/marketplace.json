@@ -10,6 +10,12 @@
       "source": "./plugins/psychometric-ai-toolkit",
       "description": "Expert-level psychometric, psychological, and statistical expertise for building AI-powered assessments. 9 knowledge domains, 3 skills, 2 agents — grounded in peer-reviewed research.",
       "version": "0.2.0"
+    },
+    {
+      "name": "super-intelligence",
+      "source": "./plugins/super-intelligence",
+      "description": "Strategic planning, focused code review, and critical evaluation — 3 skills, 1 agent, grounded in SP Superpower 2.",
+      "version": "0.1.0"
     }
   ]
 }
