@@ -9,14 +9,21 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
+  - AskUserQuestion
   - Write
   - Edit
-  - Bash
 ---
 
 # Brainstorm
 
-Collaborative discovery before planning. Brainstorming answers **WHAT** to build and **WHY** — it precedes `/plan`, which answers **HOW**.
+Collaborative discovery before planning. Answers **WHAT** to build and **WHY** — precedes `/plan`, which answers **HOW**.
+
+## Boundaries
+
+**This skill MAY:** research (read-only), discuss, ask questions, write the brainstorm document.
+**This skill MAY NOT:** edit code, create files beyond the brainstorm document, run tests, deploy, implement anything.
+
+**NEVER write code during this skill. This is a discussion, not implementation.**
 
 ## Common Rationalizations
 
@@ -24,22 +31,22 @@ Collaborative discovery before planning. Brainstorming answers **WHAT** to build
 |----------|-------------|----------|
 | "Skip reframing — the user already knows what they want" | Users describe solutions, not problems. Without reframing, you build the wrong thing. | Days of rework when the real need surfaces |
 | "Skip research — I'll brainstorm from scratch" | Reinventing what exists. The codebase has patterns, past brainstorms have context. | Wasted effort + inconsistency with existing decisions |
-| "Keep exploring — we haven't found the perfect approach" | Diminishing returns. After 2-3 solid options, more exploration adds noise, not signal. | Analysis paralysis → nothing ships |
+| "Keep exploring — we haven't found the perfect approach" | Diminishing returns. After 2-3 solid options, more exploration adds noise, not signal. | Analysis paralysis — nothing ships |
+| "Let me just write some code to test this idea" | Brainstorming is for decisions, not prototypes. Code anchors you to an approach too early. | Premature commitment to the first thing that compiles |
 
-## Workflow
+---
 
-### 1. Assess Whether Brainstorming Is Needed
+## Phase 0: Assess Whether Brainstorming Is Needed
 
-**Entry:** User has a topic or problem area. Can be vague — that's why we brainstorm.
+**Entry:** User has a topic or problem area.
 
 Not everything needs a brainstorm.
 
-**Skip brainstorming if:**
-- Requirements are already clear and specific
-- The approach is obvious (well-known pattern, done before)
-- It's a small bug fix or routine task
+**If requirements are already clear and specific:**
+Use **AskUserQuestion** to ask: "Your requirements seem clear enough to go straight to `/plan`. Want to brainstorm first, or proceed to planning?"
 
-**Suggest skipping:** "Your requirements are clear enough to proceed directly to `/plan`. Want to brainstorm anyway, or go straight to planning?"
+- If user says **plan** → exit this skill, suggest `/plan`
+- If user says **brainstorm** → continue to Phase 1
 
 **Brainstorm when:**
 - The problem is ambiguous or has multiple valid approaches
@@ -47,122 +54,160 @@ Not everything needs a brainstorm.
 - The user isn't sure what they want yet
 - There's real risk of building the wrong thing
 
-### 2. Reframe the Problem
+**Exit:** Decision made — brainstorm or skip.
 
-This is the critical step that makes brainstorming superpowered. Before exploring solutions, question the problem.
+---
 
-**Ask:**
-- "What problem are we actually solving?" — Strip away assumptions. Get to the root need.
-- "Who has this problem and when?" — Context changes solutions. A problem for 10 users is different from 10,000.
-- "What does success look like?" — Not features, outcomes. What's true when this is done?
+## Phase 1: Reframe the Problem
 
-**Don't skip this.** The biggest waste in software isn't slow execution — it's building the wrong thing. 5 minutes of reframing saves days of rework.
+**Entry:** User confirmed brainstorming is needed.
 
-### 3. Research What Exists
+This is the critical step. Before exploring solutions, question the problem.
 
-Launch the **researcher** agent to scan:
-1. `docs/brainstorms/` — past brainstorms on similar topics
-2. `docs/solutions/` — past solutions that might be relevant
-3. Codebase — existing patterns, similar features, related code
-4. `docs/plans/` — any plans that touch this area
+Use **AskUserQuestion** to ask ONE question at a time. Do not dump a questionnaire. Start with:
 
-**Surface findings:**
+1. "What problem are we actually solving?" — Strip away assumptions. Get to the root need.
+2. "Who has this problem and when?" — Context changes solutions.
+3. "What does success look like?" — Not features, outcomes.
+
+Continue asking until the problem is clear. Prefer multiple-choice questions when natural options exist. Validate assumptions explicitly: "I'm assuming X — correct?"
+
+**Exit:** Problem statement is clear and reframed. Both you and the user agree on what you're solving.
+
+---
+
+## Phase 2: Research What Exists
+
+**Entry:** Problem statement is clear (Phase 1 complete).
+
+Check the project's `CLAUDE.md` for a "Toolkit Output Paths" table. Use those paths if present, otherwise use defaults.
+
+Launch research agents **in parallel**:
+
+- Task researcher("Find existing patterns related to: <problem statement>. Search docs/brainstorms/, docs/solutions/, docs/plans/, and codebase for similar features, past decisions, and prior art.")
+
+**Surface findings to the user:**
 ```
 >> Related brainstorm: docs/brainstorms/2026-02-15-notifications-brainstorm.md
 >> Existing pattern: services/email-notifier/ (notification handling)
 >> Past solution: docs/solutions/infrastructure/sse-auth-token-refresh.md
 ```
 
-### 4. Explore Approaches
+**If no relevant findings:** Say so. Don't invent relevance.
+
+**Exit:** Findings presented. User has seen what exists before exploring approaches.
+
+---
+
+## Phase 3: Explore Approaches
+
+**Entry:** Research complete (Phase 2). User has context on what exists.
 
 Through collaborative dialogue, explore 2-3 approaches. For each:
 - **What it optimizes for** (speed, flexibility, simplicity, etc.)
 - **What it costs** (complexity, maintenance, time, risk)
 - **Who's done this before** (prior art in the codebase or industry)
 
-**Question techniques:**
-- Ask one question at a time — not a questionnaire
-- Prefer multiple choice when natural options exist
-- Start broad (purpose, users), narrow to specifics (constraints, edge cases)
-- Validate assumptions explicitly: "I'm assuming X — correct?"
+Use **AskUserQuestion** to ask one question at a time. Start broad (purpose, users), narrow to specifics (constraints, edge cases).
+
+**If any open questions emerge:** You MUST ask the user about each one. Do not assume answers or defer them silently.
 
 **Exit when:**
-- The approach is clear and the user says "proceed"
-- You've explored enough to make an informed decision
-- The user signals they've decided
+- The approach is clear and the user signals a decision
+- You've explored enough to choose (2-3 approaches with tradeoffs)
+- The user says "proceed" or equivalent
 
-### 5. Make Decisions Explicit
+---
+
+## Phase 4: Capture Decisions
+
+**Entry:** Approach chosen (Phase 3 complete).
 
 For each decision made during brainstorming, capture:
 - **What was decided** — the choice
 - **Why** — the reasoning
-- **What was rejected** — alternatives considered
+- **What was rejected** — alternatives considered and why
 
 Also capture:
-- **Open questions** — things that need to be resolved during planning or implementation
+- **Open questions** — things to resolve during planning or implementation
 - **Out of scope** — things explicitly excluded
 
-### 6. Write Brainstorm Document
+---
 
-**Exit:** Document written with explicit decisions, rationale, and open questions. `/plan` can start from this without guessing.
+## Phase 5: Write Brainstorm Document
 
-**Output path:** `docs/brainstorms/YYYY-MM-DD-{kebab-topic}-brainstorm.md`
+**Entry:** Decisions captured (Phase 4 complete).
 
-**YAML frontmatter:**
-```yaml
+**Output path:** `{brainstorms_path}/YYYY-MM-DD-{kebab-topic}-brainstorm.md`
+(Default `brainstorms_path`: `docs/brainstorms/`)
+
+Write the document with this structure:
+
+```markdown
 ---
 title: "{Topic}"
 type: brainstorm
 date: YYYY-MM-DD
 participants: [{who was involved}]
 related:
-  - {links to related brainstorms, plans, solutions}
+  - {links to related brainstorms, plans, solutions found in Phase 2}
 ---
-```
 
-**Document structure:**
-```markdown
 # {Topic}
 
 ## Problem Statement
-{The actual problem, reframed if needed}
+{The actual problem, reframed from Phase 1}
 
-## What We're Building
-{High-level description of the approach}
+## Context
+{Key findings from Phase 2 — what exists, what's been tried}
+
+## Chosen Approach
+{High-level description of the selected approach}
 
 ## Why This Approach
-{Decision rationale}
+{Decision rationale — what it optimizes for, why alternatives were rejected}
 
 ## Key Design Decisions
-### Q1: {Decision} — RESOLVED
+
+### Q1: {Decision topic} — RESOLVED
 **Decision:** {What was decided}
 **Rationale:** {Why}
-**Alternatives:** {What else was considered}
-
-## Resolved Questions
-{Questions that were answered during brainstorming}
+**Alternatives considered:** {What else was explored and why it was rejected}
 
 ## Open Questions
-{Questions that need to be answered during planning/implementation}
+{Questions that need to be answered during planning or implementation}
+
+## Out of Scope
+{Things explicitly excluded from this work}
 
 ## Next Steps
-1. /plan — create implementation plan from these decisions
+- `/plan` to create an implementation plan from these decisions
 ```
 
-### 7. Offer Next Steps
+**Exit:** Document written.
 
-```
-Brainstorm captured at docs/brainstorms/YYYY-MM-DD-{topic}-brainstorm.md
+---
 
-Next: /plan to turn these decisions into an implementation plan.
-```
+## Phase 6: Handoff
 
-## What Makes This Superpowered
+**Entry:** Document written (Phase 5 complete).
 
-- **Problem Reframing (1.4):** The brainstorm questions the problem before solving it. "What are we actually solving?" is the highest-leverage question.
-- **Opportunity Recognition (1.2):** The researcher agent surfaces past work, patterns, and prior art. You see what's already there before building something new.
-- **AI-Augmented Discovery (1.3):** Multi-source research synthesized into insights. The agent connects dots across brainstorms, solutions, and code.
-- **AI Curiosity (1.1):** Exploring multiple approaches before committing. The brainstorm rewards looking around, not jumping to the first idea.
+Use **AskUserQuestion** to present next steps:
+
+**Question:** "Brainstorm captured at `{path}`. What would you like to do next?"
+
+**Options:**
+1. **Proceed to planning** — Run `/plan` (will use this brainstorm as input)
+2. **Keep exploring** — I have more questions or want to refine decisions
+3. **Done for now** — Return later
+
+**If user selects "Keep exploring":** Return to Phase 3 and continue asking questions one at a time. When satisfied, update the document and return to this handoff.
+
+**If user selects "Proceed to planning":** Suggest running `/plan {brainstorm-path}`.
+
+**If user selects "Done for now":** Confirm the path and remind them: "To plan later: `/plan {brainstorm-path}`"
+
+---
 
 ## Validate
 
@@ -173,11 +218,11 @@ Before delivering the brainstorm document, verify:
 - [ ] Every decision has rationale and rejected alternatives documented
 - [ ] Open questions are listed — nothing swept under the rug
 - [ ] `/plan` can start from this document without asking "but what did you decide about X?"
+- [ ] No code was written — only the brainstorm document was created
 
-## Anti-patterns
+## What Makes This Superpowered
 
-- **Brainstorming alone.** A brainstorm is collaborative. Ask questions, challenge assumptions, explore together.
-- **Jumping to solutions.** "Let's use WebSockets" is a solution, not a brainstorm. Start with the problem.
-- **Endless exploration.** Brainstorming has diminishing returns. When the approach is clear, stop. Move to `/plan`.
-- **Not writing it down.** A brainstorm that isn't documented is a conversation that's forgotten. Write the doc.
-- **Brainstorming trivial things.** Small tasks don't need brainstorms. Use judgment.
+- **Problem Reframing (1.4):** Questions the problem before solving it. Highest-leverage question: "What are we actually solving?"
+- **Opportunity Recognition (1.2):** Researcher agent surfaces past work, patterns, and prior art before building new.
+- **AI-Augmented Discovery (1.3):** Multi-source research synthesized into insights — connects dots across brainstorms, solutions, and code.
+- **AI Curiosity (1.1):** Explores multiple approaches before committing. Rewards looking around, not jumping to the first idea.

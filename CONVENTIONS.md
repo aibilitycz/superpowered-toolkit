@@ -196,6 +196,232 @@ See `METHODOLOGY.md` for the anchor rule and capability layers.
 
 ---
 
+## Skill Design Patterns
+
+Skills are executable specifications — not guidance documents. They tell Claude exactly what to do, when to ask, when to branch, and when to stop.
+
+### Size and Structure
+
+- **SKILL.md target: under 500 lines.** If longer, extract detail into `references/` or `workflows/` subdirectories.
+- **One level deep only.** Files linked from SKILL.md do NOT chain to other files. Prevents reference degradation.
+- **Progressive disclosure:** SKILL.md has the routing and phases. Reference files have the domain knowledge.
+
+```
+skills/<skill-name>/
+├── SKILL.md              # Phases, routing, boundaries (under 500 lines)
+├── references/           # Optional: domain knowledge, checklists
+│   └── <topic>.md
+└── workflows/            # Optional: detailed step-by-step for complex routes
+    └── <route>.md
+```
+
+### Skill Boundaries
+
+Every skill declares what it MAY and MAY NOT do. This is non-negotiable.
+
+```markdown
+## Boundaries
+
+**This skill MAY:** research, discuss, write the brainstorm document
+**This skill MAY NOT:** edit code, create files beyond the output artifact, run tests, deploy
+```
+
+For read-only skills, enforce with the `allowed-tools` frontmatter — don't list `Write`, `Edit`, or `Bash` if the skill shouldn't use them.
+
+Hard boundary enforcement uses ALL CAPS prohibition:
+
+```markdown
+**NEVER write code during this skill. This is a discussion, not implementation.**
+```
+
+### Numbered Phases with Entry/Exit Criteria
+
+Every phase has explicit gates. Unnumbered prose produces unreliable execution.
+
+```markdown
+### Phase 2: Research
+
+**Entry:** Problem statement is clear (Phase 1 complete).
+
+1. Launch researcher agent...
+2. Surface findings...
+
+**Exit:** Findings presented. User has seen what exists before exploring approaches.
+```
+
+### User Interaction: AskUserQuestion
+
+Use the `AskUserQuestion` tool at every decision point. Don't assume — ask.
+
+**Binary choice (skip/proceed):**
+```markdown
+Use **AskUserQuestion** to ask: "Your requirements are clear enough for `/plan`.
+Brainstorm anyway, or go straight to planning?"
+```
+
+**Multi-way routing:**
+```markdown
+Use **AskUserQuestion** to present options:
+
+**Question:** "Brainstorm captured. What next?"
+
+**Options:**
+1. **Review and refine** — Improve the document
+2. **Proceed to planning** — Run `/plan`
+3. **Keep exploring** — More questions before moving on
+4. **Done for now** — Return later
+```
+
+**Routing after selection:**
+```markdown
+**If user selects "Keep exploring":** Return to Phase 2 and continue
+asking questions one at a time. When satisfied, return to this choice.
+
+**If user selects "Review and refine":** Load the `document-review` skill
+and apply it. When complete, present options 2 and 4 again.
+```
+
+### Subagent Dispatch: Task()
+
+Use explicit `Task()` syntax for subagent calls. Never describe agents vaguely — invoke them.
+
+**Single agent:**
+```markdown
+Task researcher("Find existing patterns related to: <topic>.
+Search docs/brainstorms/, docs/solutions/, and codebase.")
+```
+
+**Parallel agents:**
+```markdown
+Run these agents **in parallel**:
+
+- Task researcher(feature_description)
+- Task learnings-researcher(feature_description)
+```
+
+**Conditional agents:**
+```markdown
+**If the topic involves security, payments, or data privacy:**
+
+- Task security-reviewer(context)
+- Task best-practices-researcher(topic + "security")
+```
+
+### Wait Gates
+
+When phases depend on subagent results, enforce synchronization:
+
+```markdown
+**WAIT for all Phase 1 agents to complete before proceeding.**
+
+Collect results, then continue to Phase 2.
+```
+
+### Inter-Skill Loading
+
+Skills can invoke other skills at transition points:
+
+```markdown
+Load the `document-review` skill and apply it to the brainstorm document.
+```
+
+Or route to a slash command:
+
+```markdown
+**If user selects "Start implementation":** Run `/work` with the plan path.
+```
+
+### Conditional Branching
+
+Use explicit IF/THEN blocks — not prose that implies conditions.
+
+**Content-based routing:**
+```markdown
+**If a relevant brainstorm exists:**
+1. Read it
+2. Extract decisions and open questions
+3. Skip idea refinement — the brainstorm already answered WHAT
+
+**If no brainstorm found:**
+Run idea refinement (Phase 1.2).
+```
+
+**Detection-based routing:**
+```markdown
+**If PR contains database migrations or schema changes:**
+- Task schema-drift-detector(PR content)
+- Task data-migration-expert(PR content)
+```
+
+### Rationalizations Table
+
+Every skill includes a table of shortcuts Claude might take and why they fail:
+
+```markdown
+## Common Rationalizations
+
+| Shortcut | Why It Fails | The Cost |
+|----------|-------------|----------|
+| "Skip research — I know this" | Reinventing what exists | Wasted effort + inconsistency |
+| "Keep exploring forever" | Diminishing returns after 2-3 options | Analysis paralysis |
+```
+
+For audit/review skills, this is mandatory. For creative skills, recommended.
+
+### Degree of Freedom Calibration
+
+Not every step needs equal prescription. Match freedom to task fragility:
+
+| Fragility | Freedom | Skill Behavior |
+|-----------|---------|----------------|
+| **High** (scoring, security, destructive) | Low | "Run exactly this. No variations." |
+| **Medium** (planning, configuration) | Medium | "Use this structure, customize content." |
+| **Low** (brainstorming, exploration) | High | "Explore freely within these boundaries." |
+
+A single skill can mix freedoms. Brainstorming has high freedom in exploration (Phase 2) but low freedom in document structure (Phase 4).
+
+### Validate Checklist
+
+Every skill ends with a verification step before delivering output:
+
+```markdown
+## Validate
+
+Before delivering, verify:
+
+- [ ] Problem was reframed, not accepted at face value
+- [ ] At least 2 approaches explored with tradeoffs
+- [ ] Every decision has rationale and rejected alternatives
+- [ ] Open questions listed — nothing swept under the rug
+```
+
+### Workflow Patterns
+
+Choose ONE structural pattern based on the skill's decision structure:
+
+| Pattern | When to Use | Example |
+|---------|------------|---------|
+| **Linear progression** | Single path, no branching | `/compound` — always 1→2→3→done |
+| **Routing** | Multiple independent workflows from shared intake | `/review` — routes to code vs document vs architecture |
+| **Sequential pipeline** | Steps where output N feeds step N+1 | `/work` — research → implement → test → ship |
+| **Safety gate** | Destructive or irreversible actions | Deployment skills — analyze fully BEFORE acting |
+| **Dialogue loop** | Collaborative exploration with user | `/brainstorm` — ask → explore → ask → converge |
+
+### Anti-Patterns
+
+| Anti-Pattern | Fix |
+|-------------|-----|
+| Vague phase descriptions ("research the topic") | Specific actions ("Launch researcher agent with these search paths") |
+| Missing boundaries ("help the user") | Explicit MAY/MAY NOT declarations |
+| Linear flow where branching is needed | Add AskUserQuestion at decision points |
+| Monolithic SKILL.md (800+ lines) | Extract to references/ and workflows/ |
+| Tools listed but not needed | Principle of least privilege — only list tools actually used |
+| Phases without entry/exit criteria | Add **Entry:** and **Exit:** to every phase |
+| Describing agents vaguely ("run a research agent") | Explicit `Task agent-name(params)` syntax |
+| Skipping validation | Always end with Validate checklist |
+
+---
+
 ## Quality Gates (All Plugins)
 
 Before shipping any plugin:
@@ -207,3 +433,5 @@ Before shipping any plugin:
 5. Plugin registered in root `marketplace.json`
 6. No references to internal projects (public repo)
 7. Works without configuration (out of the box)
+8. Skills follow design patterns above (boundaries, phases, AskUserQuestion, Task() syntax)
+9. Skills under 500 lines (detail extracted to references/workflows if needed)
