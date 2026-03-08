@@ -1,0 +1,15 @@
+{
+  "name": "superpowered-toolkit",
+  "owner": {
+    "name": "aibility",
+    "url": "https://github.com/aibilitycz"
+  },
+  "plugins": [
+    {
+      "name": "psychometric-ai-toolkit",
+      "source": "./plugins/psychometric-ai-toolkit",
+      "description": "Expert-level psychometric, psychological, and statistical expertise for building AI-powered assessments. 9 knowledge domains, 3 skills, 2 agents — grounded in peer-reviewed research.",
+      "version": "0.2.0"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "psychometric-ai-toolkit",
+  "version": "0.2.0",
+  "description": "Expert-level psychometric, psychological, and statistical expertise for building AI-powered assessments. 9 knowledge domains, 3 skills, 2 agents — grounded in peer-reviewed research.",
+  "author": {
+    "name": "aibility",
+    "url": "https://github.com/aibilitycz"
+  },
+  "homepage": "https://github.com/aibilitycz/superpowered-toolkit/tree/main/plugins/psychometric-ai-toolkit",
+  "repository": "https://github.com/aibilitycz/superpowered-toolkit",
+  "license": "MIT",
+  "keywords": [
+    "psychometrics",
+    "assessment",
+    "irt",
+    "item-response-theory",
+    "reliability",
+    "validity",
+    "ai-assessment",
+    "scoring",
+    "measurement",
+    "io-psychology"
+  ]
+}
