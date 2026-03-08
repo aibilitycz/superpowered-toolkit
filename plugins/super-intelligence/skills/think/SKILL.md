@@ -45,7 +45,7 @@ Deep reasoning for decisions that matter. Expert perspectives, devil's advocate,
 - Gather relevant context: what does the codebase currently do? What are the constraints?
 
 **If invoked without a question:**
-Use **AskUserQuestion** to ask: "What decision or problem do you want to think through?"
+Use **AskUserQuestion** (header: "Topic", question: "What decision or problem do you want to think through?") with contextual options if possible, otherwise let the user type via the automatic "Other" option.
 
 **If invoked with `ultrathink`:**
 - Enable extended thinking — deeper analysis, more perspectives, longer reasoning chains
@@ -65,7 +65,17 @@ Use **AskUserQuestion** to ask: "What decision or problem do you want to think t
 | **What-If Analysis** | Uncertain about consequences | Trace each option through scenarios |
 | **Tradeoff Matrix** | Comparing options across criteria | Structured weighted comparison |
 
-**If mode isn't obvious from the question:** Use **AskUserQuestion** to present the four modes and ask which fits best. If user says "you pick," default to Expert Panel.
+**If mode isn't obvious from the question:** Use **AskUserQuestion** with:
+- question: "Which thinking mode fits this decision best?"
+- header: "Mode"
+- options:
+  1. label: "Expert Panel (Recommended)", description: "3-5 expert perspectives on this decision"
+  2. label: "Devil's Advocate", description: "Systematically attack your preferred option"
+  3. label: "What-If Analysis", description: "Trace each option through concrete scenarios"
+  4. label: "Tradeoff Matrix", description: "Weighted comparison across criteria"
+- multiSelect: false
+
+If user says "you pick," default to Expert Panel.
 
 **Exit:** Mode chosen.
 
@@ -164,19 +174,19 @@ If no clear winner: "Both A and B are defensible. The tiebreaker question is: [t
 
 **Entry:** Recommendation delivered.
 
-Use **AskUserQuestion** to present options:
-
-**Question:** "Analysis complete. What would you like to do?"
-
-**Options:**
-1. **Proceed with recommendation** — Move to `/plan` or `/work`
-2. **Challenge a point** — Push back on something in the analysis
-3. **Try a different mode** — Analyze with a different lens (e.g., Devil's Advocate after Expert Panel)
-4. **Done** — Analysis sufficient, move on
+Use **AskUserQuestion** with:
+- question: "Analysis complete. What would you like to do?"
+- header: "Next step"
+- options:
+  1. label: "Proceed", description: "Move to /plan or /work with this recommendation"
+  2. label: "Challenge a point", description: "Push back on something in the analysis"
+  3. label: "Different mode", description: "Re-analyze with a different lens (e.g., Devil's Advocate after Expert Panel)"
+  4. label: "Done", description: "Analysis sufficient, move on"
+- multiSelect: false
 
 **If user selects "Challenge a point":** Discuss, update the analysis if warranted, then return to this choice.
 
-**If user selects "Try a different mode":** Return to Phase 2 with a new mode. Combine insights from both passes.
+**If user selects "Different mode":** Return to Phase 2 with a new mode. Combine insights from both passes.
 
 ---
 

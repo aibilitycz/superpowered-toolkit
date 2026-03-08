@@ -61,7 +61,15 @@ Three investigative lenses — reasoning frameworks that each unlock a different
 | "Data doesn't look right" | **Data** | Integrity, schema, migration risks |
 | "Something is broken in prod" | **System** | Infrastructure, networking, runtime |
 
-**If unclear:** Use **AskUserQuestion** to ask: "What are we investigating? A code bug, performance issue, architecture concern, data problem, or system failure?"
+**If unclear:** Use **AskUserQuestion** with:
+- question: "What are we investigating?"
+- header: "Polarity"
+- options:
+  1. label: "Code bug", description: "Logic errors, type mismatches, broken flows"
+  2. label: "Performance", description: "Slow queries, memory leaks, bottlenecks"
+  3. label: "Architecture", description: "Pattern violations, coupling, design drift"
+  4. label: "System/Data", description: "Infrastructure failures, data integrity issues"
+- multiSelect: false
 
 **Auto-load relevant knowledge:**
 - Code + `.py` → Read `../knowledge/python-fastapi-patterns.md`
@@ -215,17 +223,17 @@ Each with a concrete scenario of what goes wrong.]
 
 **Entry:** Case report presented.
 
-Use **AskUserQuestion** to present options:
+Use **AskUserQuestion** with:
+- question: "Investigation complete. What would you like to do?"
+- header: "Next step"
+- options:
+  1. label: "Fix the issues", description: "Start implementing fixes (exits investigation mode)"
+  2. label: "Dig deeper", description: "Investigate a specific finding further"
+  3. label: "Document findings", description: "Run /compound to capture this for future reference"
+  4. label: "Done", description: "Investigation sufficient, move on"
+- multiSelect: false
 
-**Question:** "Investigation complete. What would you like to do?"
-
-**Options:**
-1. **Fix the issues** — Start implementing fixes (will exit investigation mode)
-2. **Dig deeper** — Investigate a specific finding further
-3. **Document findings** — Run `/compound` to capture this for future reference
-4. **Done** — Investigation sufficient
-
-**If user selects "Dig deeper":** Use **AskUserQuestion** to ask which finding, then return to Phase 2 focused on that trail. Present updated case report when done.
+**If user selects "Dig deeper":** Use **AskUserQuestion** (header: "Finding", question: "Which finding to dig into?") with each finding as an option. Then return to Phase 2 focused on that trail.
 
 ---
 

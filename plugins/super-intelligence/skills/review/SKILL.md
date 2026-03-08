@@ -51,7 +51,7 @@ Auto-detect based on input:
 | PR URL or number | **Code** — PR diff | `gh pr diff <number>` |
 | Directory path | **Architecture** — structural review | Analyze patterns, conventions, dependencies |
 
-**If ambiguous:** Use **AskUserQuestion** to ask: "Reviewing code changes or the document itself?"
+**If ambiguous:** Use **AskUserQuestion** (header: "Review type", question: "What are we reviewing?") with options: "Code changes" (description: "Review the diff or specific code files") and "Document" (description: "Evaluate the plan, brainstorm, or spec itself").
 
 **Exit:** Review type determined — code, document, or architecture.
 
@@ -174,15 +174,15 @@ Analyze the directory/codebase structure:
 
 **Entry:** Findings presented.
 
-Use **AskUserQuestion** to present options:
-
-**Question:** "Review complete. What would you like to do next?"
-
-**Options:**
-1. **Address findings** — Start fixing the issues (will exit review mode)
-2. **Discuss a finding** — Want to push back or get more detail on something
-3. **Document insights** — Run `/compound` to capture non-obvious patterns found
-4. **Done** — Review complete, move on
+Use **AskUserQuestion** with:
+- question: "Review complete. What would you like to do next?"
+- header: "Next step"
+- options:
+  1. label: "Address findings", description: "Start fixing the issues (exits review mode)"
+  2. label: "Discuss a finding", description: "Push back or get more detail on a specific finding"
+  3. label: "Document insights", description: "Run /compound to capture non-obvious patterns found"
+  4. label: "Done", description: "Review complete, move on"
+- multiSelect: false
 
 **If user selects "Discuss a finding":** Discuss, then return to this choice.
 

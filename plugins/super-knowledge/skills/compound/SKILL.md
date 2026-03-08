@@ -50,7 +50,14 @@ Auto-detect capture type:
 
 **If invoked after a fix:** Scan conversation for what broke, what was investigated, what fixed it.
 **If invoked with a topic** (e.g., `/compound auth token refresh`): Use as hint.
-**If unclear:** Use **AskUserQuestion** to ask: "What knowledge do you want to capture? A solution, context doc, or learning?"
+**If unclear:** Use **AskUserQuestion** with:
+- question: "What knowledge do you want to capture?"
+- header: "Type"
+- options:
+  1. label: "Solution", description: "Problem → root cause → fix → prevention (for docs/solutions/)"
+  2. label: "Context doc", description: "AI context, onboarding, or decision record"
+  3. label: "Learning", description: "Pattern, preference, or principle for CLAUDE.md or memory"
+- multiSelect: false
 
 **Exit:** Capture type determined.
 
@@ -69,7 +76,7 @@ Search docs/solutions/, CLAUDE.md, knowledge/ for:
 - Same root cause or pattern
 ```
 
-**If related content exists:** Use **AskUserQuestion** to ask: "Found related: `{path}`. Update the existing doc or create new?"
+**If related content exists:** Use **AskUserQuestion** (header: "Duplicate?", question: "Found related: {path}. Update existing or create new?") with options: "Update existing (Recommended)" (description: "Extend the existing doc — avoids parallel docs that drift") and "Create new" (description: "This is different enough to warrant a separate document").
 
 Principle: **update > create.** Don't create parallel docs that drift.
 
@@ -182,14 +189,14 @@ Knowledge captured at {path}
 Searchable by: {frontmatter keywords}
 ```
 
-Use **AskUserQuestion** to present options:
-
-**Question:** "Knowledge captured. Anything else?"
-
-**Options:**
-1. **Refine** — Adjust the document
-2. **Capture more** — Document another solution or learning
-3. **Done** — Knowledge captured, move on
+Use **AskUserQuestion** with:
+- question: "Knowledge captured. Anything else?"
+- header: "Next step"
+- options:
+  1. label: "Done", description: "Knowledge captured, move on"
+  2. label: "Refine", description: "Adjust the document"
+  3. label: "Capture more", description: "Document another solution or learning"
+- multiSelect: false
 
 **If user selects "Capture more":** Return to Phase 0.
 

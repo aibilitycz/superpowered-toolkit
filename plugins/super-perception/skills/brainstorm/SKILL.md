@@ -43,10 +43,16 @@ Collaborative discovery before planning. Answers **WHAT** to build and **WHY** �
 Not everything needs a brainstorm.
 
 **If requirements are already clear and specific:**
-Use **AskUserQuestion** to ask: "Your requirements seem clear enough to go straight to `/plan`. Want to brainstorm first, or proceed to planning?"
+Use **AskUserQuestion** with:
+- question: "Your requirements seem clear enough for /plan. Brainstorm first, or go straight to planning?"
+- header: "Approach"
+- options:
+  1. label: "Go to /plan (Recommended)", description: "Requirements are clear — skip brainstorming and start planning"
+  2. label: "Brainstorm first", description: "Explore the problem space before committing to an approach"
+- multiSelect: false
 
-- If user says **plan** → exit this skill, suggest `/plan`
-- If user says **brainstorm** → continue to Phase 1
+- If user selects **Go to /plan** → exit this skill, suggest `/plan`
+- If user selects **Brainstorm first** → continue to Phase 1
 
 **Brainstorm when:**
 - The problem is ambiguous or has multiple valid approaches
@@ -192,20 +198,20 @@ related:
 
 **Entry:** Document written (Phase 5 complete).
 
-Use **AskUserQuestion** to present next steps:
-
-**Question:** "Brainstorm captured at `{path}`. What would you like to do next?"
-
-**Options:**
-1. **Proceed to planning** — Run `/plan` (will use this brainstorm as input)
-2. **Keep exploring** — I have more questions or want to refine decisions
-3. **Done for now** — Return later
+Use **AskUserQuestion** with:
+- question: "Brainstorm captured at {path}. What would you like to do next?"
+- header: "Next step"
+- options:
+  1. label: "Proceed to /plan", description: "Turn these decisions into an implementation plan"
+  2. label: "Keep exploring", description: "More questions or refine decisions before moving on"
+  3. label: "Done for now", description: "Return later — to plan: /plan {brainstorm-path}"
+- multiSelect: false
 
 **If user selects "Keep exploring":** Return to Phase 3 and continue asking questions one at a time. When satisfied, update the document and return to this handoff.
 
-**If user selects "Proceed to planning":** Suggest running `/plan {brainstorm-path}`.
+**If user selects "Proceed to /plan":** Suggest running `/plan {brainstorm-path}`.
 
-**If user selects "Done for now":** Confirm the path and remind them: "To plan later: `/plan {brainstorm-path}`"
+**If user selects "Done for now":** Confirm the path.
 
 ---
 

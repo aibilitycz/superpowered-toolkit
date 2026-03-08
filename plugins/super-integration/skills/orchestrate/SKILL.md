@@ -126,18 +126,18 @@ Check the project's `CLAUDE.md` for a "Toolkit Output Paths" table and use overr
 **Why:** {one sentence}
 ```
 
-Use **AskUserQuestion** to present options:
-
-**Question:** "Here's where things stand. What would you like to do?"
-
-**Options:**
-1. **{Recommended action}** — {why this is the logical next step}
-2. **Something else** — Tell me what you'd like to do instead
-3. **Start fresh** — Begin a new workflow cycle
+Use **AskUserQuestion** with:
+- question: "Here's where things stand. What would you like to do?"
+- header: "Next step"
+- options:
+  1. label: "{Recommended action} (Recommended)", description: "{why this is the logical next step}"
+  2. label: "Something else", description: "Tell me what you'd like to do instead"
+  3. label: "Start fresh", description: "Begin a new workflow cycle"
+- multiSelect: false
 
 **If user selects the recommendation:** Guide them to invoke the right skill with the right arguments.
 
-**If user selects "Something else":** Use **AskUserQuestion** to ask what they want to do, then route to the matching skill.
+**If user selects "Something else":** Use **AskUserQuestion** (header: "Action", question: "What would you like to do?") with the common skill options as choices, then route.
 
 **Exit:** User routed to the right skill.
 

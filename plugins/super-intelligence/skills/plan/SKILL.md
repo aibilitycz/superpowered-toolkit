@@ -50,7 +50,7 @@ Strategic planning that fits the problem. Answers **HOW** to build what was deci
 **If the user provided a topic but no brainstorm:**
 - Check `docs/brainstorms/` (or project override path) for a recent match (last 14 days, semantic match on filename/frontmatter)
 - **If one found:** Read it and announce. Skip Phase 1.
-- **If multiple found:** Use **AskUserQuestion** to ask which brainstorm to use, or whether to proceed without one.
+- **If multiple found:** Use **AskUserQuestion** (header: "Brainstorm", question: "Multiple brainstorms match. Which one?") with each brainstorm as an option (label: filename, description: title from frontmatter). Add a "None" option: "Proceed without brainstorm context".
 - **If none found:** Continue to Phase 1.
 
 **Exit:** Context understood — brainstorm consumed (if exists), scope clear enough to research.
@@ -181,23 +181,23 @@ confidence: high | medium | low
 
 **Entry:** Plan written and saved.
 
-Use **AskUserQuestion** to present options:
-
-**Question:** "Plan ready at `{path}`. What would you like to do next?"
-
-**Options:**
-1. **Review and refine** — I'll adjust based on your feedback
-2. **Start implementation** — Run `/work` with this plan
-3. **Get a second opinion** — Run `/review` on the plan document
-4. **Done for now** — Return later
+Use **AskUserQuestion** with:
+- question: "Plan ready at {path}. What would you like to do next?"
+- header: "Next step"
+- options:
+  1. label: "Start /work (Recommended)", description: "Begin implementing this plan"
+  2. label: "Review and refine", description: "Adjust the plan based on your feedback"
+  3. label: "Get /review", description: "Structured evaluation of the plan document before starting"
+  4. label: "Done for now", description: "Return later — to start: /work {plan-path}"
+- multiSelect: false
 
 **If user selects "Review and refine":** Accept feedback, update the plan, then present these options again.
 
-**If user selects "Start implementation":** Suggest running `/work {plan-path}`.
+**If user selects "Start /work":** Suggest running `/work {plan-path}`.
 
-**If user selects "Get a second opinion":** Suggest running `/review {plan-path}`.
+**If user selects "Get /review":** Suggest running `/review {plan-path}`.
 
-**If user selects "Done for now":** Confirm the path and remind: "To start later: `/work {plan-path}`"
+**If user selects "Done for now":** Confirm the path.
 
 ---
 

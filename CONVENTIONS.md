@@ -249,37 +249,89 @@ Every phase has explicit gates. Unnumbered prose produces unreliable execution.
 **Exit:** Findings presented. User has seen what exists before exploring approaches.
 ```
 
-### User Interaction: AskUserQuestion
+### Claude Code Interaction Tools
 
-Use the `AskUserQuestion` tool at every decision point. Don't assume — ask.
+Skills can use these Claude Code tools for rich user interaction:
 
-**Binary choice (skip/proceed):**
+| Tool | Purpose | Use When |
+|------|---------|----------|
+| **AskUserQuestion** | Structured choices with UI cards | Decision points, routing, comparisons |
+| **TaskCreate/TaskUpdate** | Progress tracking with spinner, dependencies | `/work` — trackable task execution |
+| **EnterPlanMode/ExitPlanMode** | Formal plan → approve → implement flow | When plan needs explicit user sign-off |
+
+### AskUserQuestion (Structured)
+
+Use at every decision point. This is a **structured JSON tool**, not prose — Claude Code renders it as interactive UI cards.
+
+**API constraints:**
+- 1-4 questions per call
+- 2-4 options per question (an "Other" option is added automatically)
+- `header`: max 12 characters (displayed as chip/tag)
+- `label`: 1-5 words per option
+- `description`: explains tradeoffs or what happens if chosen
+- `preview`: optional — renders side-by-side comparison (code, mockups, diagrams)
+- `multiSelect`: true when multiple answers are valid
+
+**Single choice (routing):**
 ```markdown
-Use **AskUserQuestion** to ask: "Your requirements are clear enough for `/plan`.
-Brainstorm anyway, or go straight to planning?"
+Use **AskUserQuestion** with:
+- question: "Brainstorm captured. What would you like to do next?"
+- header: "Next step"
+- options:
+  1. label: "Proceed to plan", description: "Run /plan using this brainstorm as input"
+  2. label: "Keep exploring", description: "More questions before committing to an approach"
+  3. label: "Done for now", description: "Return later — path saved for /plan"
+- multiSelect: false
 ```
 
-**Multi-way routing:**
+**Multiple choice (priorities):**
 ```markdown
-Use **AskUserQuestion** to present options:
-
-**Question:** "Brainstorm captured. What next?"
-
-**Options:**
-1. **Review and refine** — Improve the document
-2. **Proceed to planning** — Run `/plan`
-3. **Keep exploring** — More questions before moving on
-4. **Done for now** — Return later
+Use **AskUserQuestion** with:
+- question: "Which areas should the plan cover?"
+- header: "Scope"
+- options:
+  1. label: "Backend API", description: "New endpoints, data models, validation"
+  2. label: "Frontend UI", description: "Components, state, user flows"
+  3. label: "Infrastructure", description: "Deployment, config, monitoring"
+  4. label: "Testing", description: "Unit, integration, E2E test plan"
+- multiSelect: true
 ```
+
+**With previews (comparing approaches):**
+```markdown
+Use **AskUserQuestion** with previews for side-by-side comparison:
+- question: "Which approach do you prefer?"
+- header: "Approach"
+- options:
+  1. label: "WebSockets", description: "Real-time bidirectional", preview: "Client ←→ Server\nPersistent connection\nLow latency\nMore complex"
+  2. label: "SSE", description: "Server push only", preview: "Client ← Server\nHTTP-based\nSimpler\nOne-way only"
+- multiSelect: false
+```
+
+**Recommended option:** Add "(Recommended)" to the label of the preferred option and list it first.
 
 **Routing after selection:**
 ```markdown
-**If user selects "Keep exploring":** Return to Phase 2 and continue
-asking questions one at a time. When satisfied, return to this choice.
+**If user selects "Keep exploring":** Return to Phase 2 and continue.
 
-**If user selects "Review and refine":** Load the `document-review` skill
-and apply it. When complete, present options 2 and 4 again.
+**If user selects "Proceed to plan":** Suggest `/plan {path}`.
 ```
+
+### Task Progress: TaskCreate/TaskUpdate
+
+For `/work` and other execution skills, use TaskCreate to show progress with spinner UI:
+
+```markdown
+Use **TaskCreate** for each plan task:
+- subject: "Add user authentication middleware"
+- description: "Create Express middleware that validates JWT tokens..."
+- activeForm: "Adding auth middleware"
+
+When starting work: **TaskUpdate** status to "in_progress" (shows spinner).
+When done: **TaskUpdate** status to "completed".
+```
+
+Tasks support dependencies (`addBlockedBy`, `addBlocks`) for ordered execution.
 
 ### Subagent Dispatch: Task()
 
