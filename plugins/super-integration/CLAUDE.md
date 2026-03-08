@@ -33,9 +33,11 @@ Where are you in the workflow?
 ├─ Know what to build, need a plan → /plan (Super Intelligence)
 ├─ Have a plan, ready to execute → /work (Super Creation)
 ├─ Code written, need review → /review (Super Intelligence)
-├─ Review done, ready to ship → /ship (Super Creation)
+├─ Review done, ready to ship → /work handles shipping too (Super Creation)
 ├─ Just solved a hard problem → /compound (Super Knowledge)
-├─ Need to evaluate a document → /document-review (Super Intelligence)
+├─ Need to evaluate a document → /review auto-detects documents (Super Intelligence)
+├─ Hard decision with multiple options → /think (Super Intelligence)
+├─ Something is broken, need root cause → /investigate (Super Intelligence)
 └─ Not sure → /orchestrate (this plugin) — it'll figure it out
 ```
 
@@ -56,12 +58,6 @@ Is this a significant feature (multi-day, multi-repo)?
 | Skill | Command | Purpose |
 |-------|---------|---------|
 | [Orchestrate](skills/orchestrate/SKILL.md) | `/orchestrate` | Conduct the full cross-plugin workflow — detect current phase, suggest next steps, maintain flow |
-
-## Agents
-
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| [Conductor](agents/conductor.md) | sonnet | Routes between superpowers, maintains workflow state, suggests transitions |
 
 ## Knowledge
 

@@ -10,7 +10,7 @@ Learn by doing and make everything reusable. Infinite memory. This plugin embodi
   - **3.2 Knowledge Architecture** — Context skill builds structured, discoverable knowledge. Only Handle It Once.
   - **3.3 Context Engineering** — Context docs are typed, versioned, cross-referenced — the right context for AI.
   - **3.4 Knowledge Compounding** — Every solved problem feeds the solution library. Knowledge grows with use.
-- **How it activates them:** `/compound` captures solutions while context is fresh. `/context` builds structured docs. The psychometric domain module demonstrates what deep, organized knowledge looks like. Using these tools builds the habit of preserving and structuring knowledge.
+- **How it activates them:** `/compound` captures solutions, builds context docs, and preserves learnings — one skill for all knowledge capture. The psychometric domain module demonstrates what deep, organized expertise looks like. Using these tools builds the habit of preserving and structuring knowledge.
 - **Why this belongs:** Knowledge that isn't captured is lost. This plugin makes knowledge capture automatic and knowledge retrieval effortless.
 
 See `../../METHODOLOGY.md` for the four capability layers and methodology anchor rule.
@@ -37,13 +37,13 @@ Did you just solve a non-trivial problem?
 └─ No → Skip — nothing to compound
 ```
 
-### Should I /context This?
+### Should I /compound a Context Doc?
 
 ```
 Is there knowledge that AI needs repeatedly?
 ├─ Yes → Is it already in CLAUDE.md or a knowledge file?
-│  ├─ Yes → Update the existing doc, don't create a new one
-│  └─ No → /context — create a structured context doc
+│  ├─ Yes → /compound to update the existing doc
+│  └─ No → /compound to create a structured context doc
 └─ No → Skip — don't create docs for one-off use
 ```
 
@@ -62,8 +62,7 @@ What's the question about?
 
 | Skill | Command | Purpose |
 |-------|---------|---------|
-| [Compound](skills/compound/SKILL.md) | `/compound` | Capture a recently solved problem as a searchable solution document |
-| [Context](skills/context/SKILL.md) | `/context` | Build and maintain structured context docs for AI consumption |
+| [Compound](skills/compound/SKILL.md) | `/compound` | Capture knowledge — solutions, context docs, learnings, and principles |
 | [Psychometric Advisor](skills/psychometric-advisor/SKILL.md) | `/psychometric-advisor` | Expert psychometric guidance across 9 domains (IRT, reliability, validity, scoring, etc.) |
 | [Item Designer](skills/item-designer/SKILL.md) | `/item-designer` | 5-step guided workflow for creating assessment items |
 | [Scoring Reviewer](skills/scoring-reviewer/SKILL.md) | `/scoring-reviewer` | Validate scoring changes against psychometric standards |

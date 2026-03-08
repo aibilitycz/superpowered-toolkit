@@ -3,11 +3,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-Plugin-6366f1)](https://claude.com/claude-code)
 [![Skills](https://img.shields.io/badge/Skills-1-green)]()
-[![Agents](https://img.shields.io/badge/Agents-1-green)]()
 
 A Claude Code plugin for cross-plugin workflow orchestration — the conductor that routes work through the right superpowers at the right time.
 
-1 skill. 1 agent. The whole is greater than the sum.
+1 skill. The whole is greater than the sum.
 
 ## What It Does
 
@@ -32,7 +31,6 @@ Part of the [Superpowered Toolkit](https://github.com/aibilitycz/superpowered-to
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `orchestrate` | Skill | Cross-plugin workflow conductor — detect phase, suggest next steps, maintain flow |
-| `conductor` | Agent | Routes between superpowers, tracks workflow state |
 
 ## The Full Loop
 
@@ -45,8 +43,6 @@ Part of the [Superpowered Toolkit](https://github.com/aibilitycz/superpowered-to
     ↓ reads plan, executes, commits
 /review (Super Intelligence)
     ↓ reads changes, produces review
-/ship (Super Creation)
-    ↓ quality checks, release notes, push
 /compound (Super Knowledge)
     ↓ captures solution for future use
 ```

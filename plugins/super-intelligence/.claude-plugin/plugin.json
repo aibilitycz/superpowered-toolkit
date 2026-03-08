@@ -1,7 +1,7 @@
 {
   "name": "super-intelligence",
   "version": "0.1.0",
-  "description": "Strategic planning, focused code review, and critical evaluation — grounded in the Super Intelligence superpower.",
+  "description": "Strategic planning, deep thinking, focused review, and detective investigation — grounded in the Super Intelligence superpower.",
   "author": {
     "name": "aibility",
     "url": "https://github.com/aibilitycz"
@@ -16,6 +16,9 @@
     "task-decomposition",
     "decision-making",
     "strategic-thinking",
-    "document-review"
+    "investigation",
+    "deep-thinking",
+    "expert-panel",
+    "root-cause-analysis"
   ]
 }

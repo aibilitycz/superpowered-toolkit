@@ -1,10 +1,11 @@
 ---
 name: compound
 description: >
-  Capture a recently solved problem as a searchable solution document. Use after fixing
-  non-trivial bugs, resolving tricky issues, or discovering gotchas worth preserving.
+  Capture knowledge — solutions, context docs, learnings, and principles. Use after fixing
+  non-trivial bugs, creating context for AI, or discovering patterns worth preserving.
   Triggers: compound, document solution, capture fix, save solution, knowledge compound,
-  document this, save this fix.
+  document this, save this fix, context, create context, update context, build context,
+  learn, save learning, remember this.
 allowed-tools:
   - Read
   - Grep
@@ -17,54 +18,53 @@ allowed-tools:
 
 # Compound
 
-Capture a recently solved problem while context is fresh. The solution goes into `docs/solutions/` with searchable frontmatter so next time someone hits the same issue, the answer is already there.
+Capture knowledge while context is fresh. Solutions, context docs, learnings — whatever you just discovered, structure it so it's findable and useful next time.
 
-**Why "compound"?** Each documented solution compounds your team's knowledge. The first time you solve a problem takes research. Document it, and the next occurrence takes minutes. Knowledge compounds.
+**Why "compound"?** Each piece of captured knowledge compounds your team's effectiveness. The first time you solve a problem takes research. Document it, and the next occurrence takes minutes. Knowledge compounds.
 
 ## Workflow
 
-### 1. Detect the Problem
+### 1. Detect What to Capture
 
-**If invoked with context** (e.g., after a fix in the current session):
-- Scan the recent conversation for: what broke, what was investigated, what fixed it
-- Identify: component, symptoms, root cause, fix
+Auto-detect the capture type based on context:
 
-**If invoked with an argument** (e.g., `/compound auth token refresh`):
-- Use the argument as a hint for what to document
-- Ask clarifying questions if the problem/fix isn't clear from context
+| Context | Capture Type | Output |
+|---------|-------------|--------|
+| Just fixed a bug, resolved an error | **Solution** | `docs/solutions/{domain}/{topic}.md` |
+| Need to create/update AI context | **Context doc** | `CLAUDE.md`, `knowledge/{topic}.md`, or `docs/` |
+| Discovered a pattern, preference, or principle | **Learning** | `CLAUDE.md` or memory files |
 
-**If invoked with no context:**
-- Ask: "What problem did you just solve? Brief description is fine — I'll help structure it."
+**If invoked after a fix:** Scan conversation for what broke, what was investigated, what fixed it.
+**If invoked with a topic** (e.g., `/compound auth token refresh`): Use as a hint, ask if unclear.
+**If invoked with no context:** Ask: "What knowledge do you want to capture? A solution, context doc, or learning?"
 
-### 2. Research Duplicates
+### 2. Check for Duplicates
 
-Before writing, check if this solution already exists:
+Before writing, check if this knowledge already exists:
 
 ```
-Search docs/solutions/ for:
+Search docs/solutions/, CLAUDE.md, knowledge/ for:
 - Similar symptoms or component names
-- Same error messages
-- Same root cause category
+- Same error messages or topic
+- Same root cause or pattern
 ```
 
-**If a related solution exists:**
-- Announce: "Found related: `docs/solutions/{path}`. Update the existing doc or create a new one?"
-- If updating, edit the existing file to add the new context
+**If related content exists:** "Found related: `{path}`. Update the existing doc or create new?" Principle: **update > create.** Don't create parallel docs that drift.
 
-### 3. Extract Solution
+### 3. Capture
 
-From the conversation or user input, extract:
+#### Solution Capture
 
-1. **Problem** — What happened? What were the symptoms?
-2. **Root cause** — Why did it happen? What was actually wrong?
+Extract from conversation or user input:
+
+1. **Problem** — What happened? Symptoms?
+2. **Root cause** — Why did it happen?
 3. **Fix** — What resolved it? Include the specific change.
-4. **Prevention** — How to avoid this in the future? Tests, checks, patterns.
-
-### 4. Write Solution Document
+4. **Prevention** — How to avoid this in the future?
 
 **Output path:** `docs/solutions/{domain}/{kebab-topic}.md`
 
-**Domains:** Choose the most specific: `auth`, `database`, `scoring`, `frontend`, `backend`, `infrastructure`, `deployment`, `testing`, `integration`, or create a new one if needed.
+**Domains:** `auth`, `database`, `scoring`, `frontend`, `backend`, `infrastructure`, `deployment`, `testing`, `integration`, or create a new one if needed.
 
 **YAML frontmatter:**
 ```yaml
@@ -95,35 +95,62 @@ related: []
 ## Fix
 {What resolved it. Specific code changes, config changes, or commands.}
 
-```{language}
-// The specific fix — code diff, config change, command
-```
-
 ## Prevention
-{How to avoid this in the future. Tests to add, patterns to follow, checks to implement.}
+{How to avoid this in the future. Tests, patterns, checks.}
 
 ## Related
 - {Links to related solutions, ADRs, or documentation}
 ```
 
-### 5. Confirm
+#### Context Doc Capture
+
+Determine the right location:
+
+| Type | When to Use | Where It Goes |
+|------|------------|--------------|
+| **Project CLAUDE.md** | Core conventions, rules for every session | Root `CLAUDE.md` |
+| **Knowledge file** | Domain reference loaded on demand by skills/agents | `knowledge/{topic}.md` |
+| **Onboarding doc** | Setup instructions, architecture overview | `docs/developers/` |
+| **Decision record** | Why a specific technical decision was made | `architecture/decisions/` |
+
+**For CLAUDE.md:** Keep it concise — loaded every session. Tables for quick reference, decision trees for conditional logic. Link to details rather than inlining.
+
+**For knowledge files:** 800-1200 words. Accessible voice. Structure: what and why → how → pitfalls/anti-patterns. Cross-reference related knowledge files.
+
+**For any context doc:** Open with purpose. Be specific. Include examples. Date it.
+
+#### Learning Capture
+
+For patterns, preferences, or principles:
+
+- **If project-specific:** Add to project CLAUDE.md or memory files
+- **If toolkit-wide:** Add to the relevant plugin's knowledge/ directory
+- Keep it concise — one pattern per entry
+
+### 4. Verify and Confirm
 
 After writing:
 ```
-Solution captured at docs/solutions/{domain}/{topic}.md
-Searchable by: {list of frontmatter symptoms and keywords}
+Knowledge captured at {path}
+Searchable by: {list of frontmatter keywords or section}
 ```
+
+- If it's a knowledge file, verify the skill that references it can find it
+- If it's CLAUDE.md, verify it doesn't duplicate existing entries
+- If it's a solution doc, verify frontmatter has searchable symptoms
 
 ## What Makes This Superpowered
 
 - **Knowledge Compounding (3.4):** Every solution captured makes the next occurrence faster. The library grows with use.
-- **Iterative Learning (3.1):** You learned something by doing — now it's preserved for next time.
-- **Knowledge Architecture (3.2):** Solutions are structured with frontmatter for machine retrieval. Not a blog post — a searchable knowledge base.
-- **Cross-plugin bridge:** Other plugins surface these solutions automatically. `/plan` checks `docs/solutions/` before planning. `/review` suggests `/compound` when it finds insights.
+- **Context Engineering (3.3):** Preparing the right context for AI consumption — structured, typed, discoverable.
+- **Knowledge Architecture (3.2):** Solutions with frontmatter for machine retrieval. Context docs organized by type and purpose. Not random docs — structured knowledge.
+- **Cross-plugin bridge:** Other plugins surface this knowledge. `/plan` checks `docs/solutions/` before planning. `/review` suggests `/compound` when it finds insights.
 
 ## Anti-patterns
 
-- **Documenting the obvious.** "I fixed a typo" doesn't need a solution doc. Save this for non-trivial problems.
-- **Writing a novel.** Keep it concise. Problem → root cause → fix → prevention. Not a blog post.
-- **Skipping the frontmatter.** The frontmatter IS the search index. Without symptoms and root_cause, the doc is hard to find later.
-- **Never searching first.** Always check `docs/solutions/` before creating a new doc. Duplicates dilute the library.
+- **Documenting the obvious.** "I fixed a typo" doesn't need a solution doc.
+- **Writing a novel.** Keep it concise. Problem → root cause → fix → prevention.
+- **Skipping the frontmatter.** The frontmatter IS the search index.
+- **Never searching first.** Always check existing docs. Duplicates dilute the library.
+- **Context dumps.** Don't paste everything into CLAUDE.md. Keep it focused — link to details.
+- **Stale context.** Date your docs. Review periodically.

@@ -35,15 +35,15 @@ superpowered-toolkit/
 | Plugin | Superpower | Version | What It Does |
 |--------|-----------|---------|-------------|
 | [super-perception](plugins/super-perception/) | 1. Perception | 0.1.0 | `/brainstorm` — discovery, problem reframing, research |
-| [super-intelligence](plugins/super-intelligence/) | 2. Intelligence | 0.1.0 | `/plan`, `/review`, `/document-review` — planning, code review, evaluation |
-| [super-knowledge](plugins/super-knowledge/) | 3. Knowledge | 0.1.0 | `/compound`, `/context` + psychometric domain (9 domains, 5 skills, 3 agents) |
-| [super-creation](plugins/super-creation/) | 4. Creation | 0.1.0 | `/work`, `/ship` — execution, quality checks, release notes |
+| [super-intelligence](plugins/super-intelligence/) | 2. Intelligence | 0.1.0 | `/plan`, `/review`, `/think`, `/investigate` — planning, review, reasoning, investigation |
+| [super-knowledge](plugins/super-knowledge/) | 3. Knowledge | 0.1.0 | `/compound` + psychometric domain (9 domains, 4 skills, 3 agents) |
+| [super-creation](plugins/super-creation/) | 4. Creation | 0.1.0 | `/work` — execute plans from start to ship |
 | [super-integration](plugins/super-integration/) | 5. Integration | 0.1.0 | `/orchestrate` — cross-plugin workflow conductor |
 
 ## The Full Loop
 
 ```
-/brainstorm (Perception) → /plan (Intelligence) → /work (Creation) → /review (Intelligence) → /ship (Creation) → /compound (Knowledge)
+/brainstorm (Perception) → /plan (Intelligence) → /work (Creation) → /review (Intelligence) → /compound (Knowledge)
 ```
 
 Not every task needs the full loop. Match the flow to the task size and risk.

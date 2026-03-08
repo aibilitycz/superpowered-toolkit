@@ -14,19 +14,19 @@
     {
       "name": "super-intelligence",
       "source": "./plugins/super-intelligence",
-      "description": "Strategic planning, focused code review, and critical evaluation — 3 skills, 1 agent.",
+      "description": "Strategic planning, deep thinking, focused review, and detective investigation — 4 skills, 2 agents.",
       "version": "0.1.0"
     },
     {
       "name": "super-knowledge",
       "source": "./plugins/super-knowledge",
-      "description": "Knowledge compounding, context engineering, and expert psychometric knowledge — 5 skills, 3 agents, 9 domains.",
+      "description": "Knowledge compounding, context engineering, and expert psychometric knowledge — 4 skills, 3 agents, 9 domains.",
       "version": "0.1.0"
     },
     {
       "name": "super-creation",
       "source": "./plugins/super-creation",
-      "description": "Execute plans, ship features, and build at speed — AI does 90%, you craft the 10%.",
+      "description": "Execute plans from start to ship — AI does 90%, you craft the 10%.",
       "version": "0.1.0"
     },
     {

@@ -2,20 +2,19 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-Plugin-6366f1)](https://claude.com/claude-code)
-[![Skills](https://img.shields.io/badge/Skills-3-green)]()
-[![Agents](https://img.shields.io/badge/Agents-1-green)]()
+[![Skills](https://img.shields.io/badge/Skills-4-green)]()
+[![Agents](https://img.shields.io/badge/Agents-2-green)]()
 
-A Claude Code plugin for strategic planning, focused code review, and critical evaluation — grounded in the Super Intelligence superpower.
+A Claude Code plugin for strategic planning, deep thinking, focused review, and detective-style investigation — grounded in the Super Intelligence superpower.
 
-3 skills. 1 agent. 3 knowledge files. Better thinking, not more process.
+4 skills. 2 agents. 3 knowledge files. Better thinking, not more process.
 
 ## What It Does
 
-Replaces bloated planning and review workflows with focused, superpowered alternatives:
-
-- **`/plan`** — Strategic planning that auto-calibrates to your problem. Simple feature? Concise plan. Complex multi-repo work? Detailed plan with alternatives, risks, and phased implementation. Always includes decision rationale — WHY, not just WHAT.
-- **`/review`** — One focused code review instead of nine shallow ones. Evidence-based findings, explicit uncertainty, clear verdict.
-- **`/document-review`** — Evaluate brainstorms, plans, and specs before starting work. Checks for decision rationale, risk awareness, and actionability.
+- **`/plan`** — Strategic planning that auto-calibrates to your problem. Simple feature? Concise plan. Complex multi-repo work? Detailed plan with alternatives, risks, and phased implementation.
+- **`/review`** — One focused review of code, documents, or architecture. Auto-detects what you're reviewing. Evidence-based findings, explicit uncertainty, clear verdict.
+- **`/think`** — Deep reasoning for hard decisions. Expert panel simulation, devil's advocate, what-if scenarios, and structured tradeoff analysis.
+- **`/investigate`** — Detective-style investigation with three lenses: Sherlock (deduction), Poirot (intent), Columbo (what's missing). Works on code, performance, architecture, data, and systems.
 
 ## Install
 
@@ -34,9 +33,11 @@ Part of the [Superpowered Toolkit](https://github.com/aibilitycz/superpowered-to
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `plan` | Skill | Strategic planning with auto-calibrated detail, dependency ordering, and past solution surfacing |
-| `review` | Skill | Focused code review — one deep pass with severity-rated findings and verdict |
-| `document-review` | Skill | Structured evaluation of brainstorms, plans, and specs against Critical Trust criteria |
+| `review` | Skill | Focused review of code, documents, or architecture — auto-detects scope, one deep pass |
+| `think` | Skill | Deep reasoning — expert panels, devil's advocate, what-if scenarios, tradeoff matrices |
+| `investigate` | Skill | Detective-style investigation with Sherlock/Poirot/Columbo lenses — code, performance, architecture, data, systems |
 | `strategic-reviewer` | Agent | The review engine — reads deeply, evaluates with evidence, flags uncertainty |
+| `investigator` | Agent | The detective — follows evidence trails, deduces root causes, catches what's missing |
 
 ## Knowledge
 

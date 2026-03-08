@@ -53,11 +53,21 @@ Did you change code?
 
 ```
 Is this document going to drive implementation?
-├─ Yes → /document-review before starting work
+├─ Yes → /review the document before starting work
 │  └─ Are there open questions or unclear scope?
 │     ├─ Yes → Resolve before proceeding
 │     └─ No → Ready for /work
 └─ No → Read it, but formal review is optional
+```
+
+### When to /think
+
+```
+Is this a hard decision with multiple valid options?
+├─ Yes → Are the stakes high (hard to reverse, expensive if wrong)?
+│  ├─ Yes → /think — full analysis
+│  └─ No → Quick mental evaluation, then decide
+└─ No → Just decide and move
 ```
 
 ## Skills
@@ -65,14 +75,16 @@ Is this document going to drive implementation?
 | Skill | Command | Purpose |
 |-------|---------|---------|
 | [Plan](skills/plan/SKILL.md) | `/plan` | Strategic planning with auto-calibrated detail, decision rationale, dependency ordering |
-| [Review](skills/review/SKILL.md) | `/review` | Focused code review with one deep pass, evidence-based findings, clear verdict |
-| [Document Review](skills/document-review/SKILL.md) | `/document-review` | Evaluate brainstorms, plans, and specs for decision rationale, risks, and actionability |
+| [Review](skills/review/SKILL.md) | `/review` | Focused review of code, documents, or architecture — auto-detects scope, one deep pass |
+| [Think](skills/think/SKILL.md) | `/think` | Deep reasoning — expert panels, devil's advocate, what-if scenarios, tradeoff analysis |
+| [Investigate](skills/investigate/SKILL.md) | `/investigate` | Detective-style investigation — follows evidence trails with Sherlock/Poirot/Columbo lenses |
 
 ## Agents
 
 | Agent | Model | Purpose |
 |-------|-------|---------|
 | [Strategic Reviewer](agents/strategic-reviewer.md) | sonnet | Focused code review with Critical Trust — reads deeply, evaluates with evidence, flags uncertainty |
+| [Investigator](agents/investigator.md) | sonnet | Detective agent — follows evidence trails across code, performance, architecture, data, systems |
 
 ## Knowledge
 

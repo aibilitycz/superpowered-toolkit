@@ -1,10 +1,11 @@
 ---
 name: review
 description: >
-  Focused code review with one deep pass, evidence-based findings, and clear verdict.
-  Use when reviewing branch diffs, specific files, or PR URLs. One reviewer that reads
-  carefully beats nine that skim. Triggers: review, code review, review PR, review diff,
-  review changes, check code.
+  Focused review of code, documents, or architecture — one deep pass with evidence-based
+  findings and clear verdict. Auto-detects what you're reviewing: branch diff, PR, file path,
+  plan, brainstorm, or spec. One reviewer that reads carefully beats nine that skim.
+  Triggers: review, code review, review PR, review diff, review plan, review brainstorm,
+  review spec, review document, evaluate, check.
 allowed-tools:
   - Read
   - Grep
@@ -15,39 +16,36 @@ allowed-tools:
 
 # Review
 
-One focused code review. Not nine shallow passes — one deep one that reads carefully, evaluates with evidence, and gives a clear verdict.
+One focused review. Not nine shallow passes — one deep one that reads carefully, evaluates with evidence, and gives a clear verdict. Works on code, documents, and architecture.
 
 ## Workflow
 
-### 1. Determine Scope
+### 1. Detect Review Type
 
-**No arguments:** Review current branch diff against the default branch.
-```bash
-git diff $(git merge-base HEAD main)..HEAD
-```
+Auto-detect what's being reviewed based on the input:
 
-**File path argument:** Review those specific files.
-```bash
-# Read the specified files
-```
+| Input | Review Type | Approach |
+|-------|------------|----------|
+| No arguments | **Code** — current branch diff | `git diff $(git merge-base HEAD main)..HEAD` |
+| File path to `.md` in `docs/plans/`, `docs/brainstorms/` | **Document** — plan or brainstorm | Read and evaluate against document criteria |
+| File path to code files | **Code** — specific files | Read and review those files |
+| PR URL or number | **Code** — PR diff | `gh pr diff <number>` |
+| Directory path | **Architecture** — structural review | Analyze patterns, conventions, dependencies |
 
-**PR URL argument:** Fetch the PR diff.
-```bash
-gh pr diff <number>
-```
+**If ambiguous:** Ask once. "Reviewing code changes or the document itself?"
 
-**If the diff is large (>500 lines):** Focus on the most impactful files first. Read all of them, but prioritize findings from core logic over boilerplate, tests, or generated code.
+### 2. Gather Context
 
-### 2. Understand Context
+Before reviewing, understand what "correct" looks like:
 
-Before reviewing, gather context:
-
-1. **Read the project's CLAUDE.md** for conventions and patterns. This tells you what "correct" looks like for this project.
-2. **Check what the change touches.** Does it touch auth, scoring, data, migrations, money? These areas get extra scrutiny.
-3. **Read the related plan or brainstorm** if one is referenced in recent commits or the PR description. Judge the code against its purpose.
+1. **Read the project's CLAUDE.md** for conventions and patterns
+2. **Check what the change touches.** Auth, scoring, data, migrations, money → extra scrutiny
+3. **Read the related plan or brainstorm** if referenced in commits or PR description
 4. **Check for test files** in the diff. Note what's tested and what's not.
 
 ### 3. Review
+
+#### Code Review
 
 Launch the **strategic-reviewer** agent with:
 - The full diff (or file contents)
@@ -55,11 +53,41 @@ Launch the **strategic-reviewer** agent with:
 - Any plan/brainstorm context
 - What areas the change touches (for priority calibration)
 
-The agent does one focused review pass. No parallel swarm, no multiple passes. One reviewer that does the job well.
+The agent does one focused review pass. No parallel swarm. One reviewer that does the job well.
+
+**If the diff is large (>500 lines):** Focus on the most impactful files first. Read all of them, but prioritize findings from core logic over boilerplate, tests, or generated code.
+
+#### Document Review
+
+Read the full document. Don't skim — read it once, thoroughly. Evaluate against these criteria:
+
+**Does it explain WHY?**
+- Is there decision rationale? Not just "we'll use X" but "we'll use X because Y, and we considered Z."
+- Are there decisions made without explanation? Flag each one.
+
+**Are risks identified?**
+- Does it acknowledge what could go wrong? Are mitigations proposed?
+- Are there risks the author missed? (Security, performance, backward compatibility, data migration, cross-team dependencies)
+
+**Is the scope clear?**
+- Can you tell exactly what's in scope and what's not?
+- Is there an explicit "out of scope" or "deferred" section?
+
+**Are acceptance criteria measurable?**
+- Can you determine from the criteria alone whether the feature is complete?
+- Are criteria testable? "Users can do X" is testable. "The system is fast" is not.
+
+**Are there unresolved blockers?**
+- Open questions that should be answered before work begins?
+- TBD or TODO items that would block implementation?
+
+**Is it actionable?**
+- Could someone start `/work` from this document right now?
+- Are dependencies between tasks clear?
 
 ### 4. Present Findings
 
-Present the agent's findings in conversation. Not in todo files, not in separate documents — right here in the chat.
+**For code reviews:**
 
 ```markdown
 ## Review: [scope summary]
@@ -76,9 +104,26 @@ Present the agent's findings in conversation. Not in todo files, not in separate
 ### Verdict: APPROVE / APPROVE WITH NOTES / REQUEST CHANGES
 ```
 
-**If no issues found:** Say so clearly. "No critical issues or suggestions. Code is clean, follows conventions, and does what the plan says. APPROVE."
+**For document reviews:**
 
-**If verdict is REQUEST CHANGES:** Name the specific critical issues. Don't leave it vague.
+```markdown
+## Document Review: [filename]
+
+### Strengths
+- [What's well done — be specific, not generic praise]
+
+### Gaps
+- [GAP-1] [What's missing or unclear] — Why this matters for implementation.
+
+### Suggestions
+- [SUG-1] [Specific improvement] — How this makes the document more actionable.
+
+### Verdict: READY / NEEDS REFINEMENT
+
+[1-2 sentence summary. If NEEDS REFINEMENT, name the top 1-3 things to fix before starting work.]
+```
+
+**If no issues found:** Say so clearly. Don't invent problems.
 
 ### 5. Bridge to Knowledge Compounding
 
@@ -88,22 +133,22 @@ If the review uncovered a non-obvious pattern, gotcha, or insight worth preservi
 >> This review found [insight]. Worth documenting for the team? /compound
 ```
 
-Only suggest this when genuinely useful. Most reviews don't produce novel insights — that's fine.
+Only suggest when genuinely useful. Most reviews don't produce novel insights — that's fine.
 
 ## What Makes This Superpowered
 
-- **Critical Trust (2.1):** The reviewer flags uncertainty. "I'm not sure about X — verify with Y" instead of faking confidence. This models calibrated trust.
-- **One deep review > nine shallow ones.** The strategic-reviewer agent reads the full diff, understands intent, and prioritizes findings. Nine agents skimming produce noise. One agent reading carefully produces signal.
-- **Knowledge compounding bridge.** When a review uncovers something worth preserving, it suggests capturing it. Reviews aren't just quality gates — they're learning opportunities.
-- **No configuration needed.** No settings file, no agent selection, no "which reviewers do you want?" One reviewer, works out of the box.
+- **Critical Trust (2.1):** The reviewer flags uncertainty. "I'm not sure about X — verify with Y" instead of faking confidence.
+- **One deep review > nine shallow ones.** One agent reading carefully produces signal. Nine agents skimming produce noise.
+- **Universal scope.** Code, documents, architecture — one skill, one deep pass. The detective doesn't care whether the evidence is code or prose.
+- **Knowledge compounding bridge.** Reviews aren't just quality gates — they're learning opportunities.
 
 ## When NOT to Use /review
 
 - **Trivial changes.** Typo fixes, config updates, formatting. Just commit.
-- **Generated code.** If a tool generated it (migrations, lockfiles), review the input, not the output.
-- **You just want a linter.** Run the linter instead. `/review` is for semantic review, not style enforcement.
+- **Generated code.** Review the input, not the output. Migrations, lockfiles, etc.
+- **You just want a linter.** Run the linter instead. `/review` is for semantic review.
 
 ## Knowledge References
 
 - `../knowledge/critical-evaluation.md` — How to evaluate with evidence and flag uncertainty
-- `../agents/strategic-reviewer.md` — The agent that does the actual review
+- `../agents/strategic-reviewer.md` — The agent that does the actual code review

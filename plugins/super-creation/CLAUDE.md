@@ -10,7 +10,7 @@ Creating, building, and shipping at speed. AI does 90%, you craft the 10% that m
   - **4.2 The 90/10 Craft** — Focus on the 10% that matters. AI handles the volume, you handle the quality.
   - **4.3 Building** — Execute plans, write code, run tests, commit working software.
   - **4.4 Multi-Format Production** — Ship skill handles release notes, changelogs, and documentation in one pass.
-- **How it activates them:** `/work` executes plans with continuous testing and incremental commits — shipping behavior, not planning behavior. `/ship` finalizes with release notes and quality checks. The workflow rewards finishing, not perfecting.
+- **How it activates them:** `/work` executes plans from start to ship — continuous testing, incremental commits, quality checks, release notes. One skill, full lifecycle. The workflow rewards finishing, not perfecting.
 - **Why this belongs:** Ideas without execution are worthless. This plugin turns plans into shipped software.
 
 See `../../METHODOLOGY.md` for the four capability layers and methodology anchor rule.
@@ -50,30 +50,11 @@ Did you just complete a logical unit?
       └─ Yes → Commit current state as a checkpoint
 ```
 
-### When to /ship
-
-```
-Are all plan checkboxes checked?
-├─ Yes → Do all tests pass?
-│  ├─ Yes → Does linting pass?
-│  │  ├─ Yes → /ship — all systems go
-│  │  └─ No → Fix lint issues, then /ship
-│  └─ No → Fix failing tests first
-└─ No → Keep working — finish the feature
-```
-
 ## Skills
 
 | Skill | Command | Purpose |
 |-------|---------|---------|
-| [Work](skills/work/SKILL.md) | `/work` | Execute a plan — read tasks, implement, test, commit incrementally |
-| [Ship](skills/ship/SKILL.md) | `/ship` | Finalize a feature — quality checks, release notes, push |
-
-## Agents
-
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| [Builder](agents/builder.md) | sonnet | Focused execution agent — implements tasks following existing patterns |
+| [Work](skills/work/SKILL.md) | `/work` | Execute a plan from start to ship — implement, test, commit, quality checks, release notes, push |
 
 ## Knowledge
 

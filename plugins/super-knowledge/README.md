@@ -2,21 +2,18 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-Plugin-6366f1)](https://claude.com/claude-code)
-[![Skills](https://img.shields.io/badge/Skills-5-green)]()
+[![Skills](https://img.shields.io/badge/Skills-4-green)]()
 [![Agents](https://img.shields.io/badge/Agents-3-green)]()
 [![Psychometric Domains](https://img.shields.io/badge/Domains-9-orange)]()
 [![Citations](https://img.shields.io/badge/Citations-68+-orange)]()
 
 A Claude Code plugin for knowledge compounding, context engineering, and expert psychometric knowledge — learn by doing, never forget.
 
-5 skills. 3 agents. 9 psychometric knowledge domains. Knowledge that grows with every interaction.
+4 skills. 3 agents. 9 psychometric knowledge domains. Knowledge that grows with every interaction.
 
 ## What It Does
 
-Two knowledge workflows plus a complete psychometric expert:
-
-- **`/compound`** — Capture a recently solved problem as a searchable solution. While context is fresh, document the problem, root cause, and fix. Next time someone hits the same issue, the answer is already there.
-- **`/context`** — Build and maintain structured context documents for AI consumption. The right context makes AI dramatically more effective.
+- **`/compound`** — Capture knowledge while context is fresh. Solutions, context docs, learnings — auto-detects what to capture and structures it for retrieval.
 - **`/psychometric-advisor`** — Expert psychometric guidance across 9 domains. Ask about IRT models, reliability, validity, scoring — get evidence-based answers with citations.
 - **`/item-designer`** — Guided 5-step workflow for creating psychometrically sound assessment items.
 - **`/scoring-reviewer`** — Validate scoring changes against a 10-point psychometric checklist.
@@ -37,8 +34,7 @@ Part of the [Superpowered Toolkit](https://github.com/aibilitycz/superpowered-to
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `compound` | Skill | Capture problem/solution pairs into searchable solution library |
-| `context` | Skill | Build structured context documents for AI consumption |
+| `compound` | Skill | Capture knowledge — solutions, context docs, learnings, and principles |
 | `psychometric-advisor` | Skill | Expert guidance across 9 psychometric domains with evidence-based answers |
 | `item-designer` | Skill | 5-step guided workflow for assessment item creation |
 | `scoring-reviewer` | Skill | Validate scoring changes against psychometric standards |
