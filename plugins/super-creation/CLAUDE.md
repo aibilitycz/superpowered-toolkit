@@ -61,6 +61,7 @@ Did you just complete a logical unit?
 | File | Topic |
 |------|-------|
 | [The 90/10 Craft](knowledge/ninety-ten-craft.md) | How to focus on the 10% that matters — what AI handles, what you craft |
+| [CI/CD Patterns](knowledge/ci-cd-patterns.md) | GitHub Actions, Docker builds, deployment pipelines, rollback procedures |
 
 ## Disclaimer
 

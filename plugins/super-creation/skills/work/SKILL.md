@@ -39,6 +39,14 @@ Execute a plan and ship it. Read the tasks, implement them in dependency order, 
 
 `/work` executes a plan. If there's no plan, there's nothing to execute.
 
+### Knowledge Loading
+
+**Auto-load relevant knowledge for the task at hand:**
+- CI/CD tasks (`.github/`, `Dockerfile`, deployment configs) → Read `../knowledge/ci-cd-patterns.md`
+- Infrastructure tasks (`.tf`, `.yaml`, Helm, k8s) → Read `../../super-intelligence/knowledge/infrastructure-ops.md`
+
+Load before starting work. These patterns supplement the plan's instructions.
+
 ### 1. Read and Understand the Plan
 
 **If invoked with a plan path** (e.g., `/work docs/plans/2026-03-08-feat-notifications-plan.md`):

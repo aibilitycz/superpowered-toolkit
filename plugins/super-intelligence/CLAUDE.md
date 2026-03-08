@@ -85,6 +85,11 @@ Is this a hard decision with multiple valid options?
 |-------|-------|---------|
 | [Strategic Reviewer](agents/strategic-reviewer.md) | sonnet | Focused code review with Critical Trust — reads deeply, evaluates with evidence, flags uncertainty |
 | [Investigator](agents/investigator.md) | sonnet | Detective agent — follows evidence trails across code, performance, architecture, data, systems |
+| [Python Reviewer](agents/python-reviewer.md) | sonnet | Python-specialized review — async, Pydantic, SQLAlchemy, FastAPI patterns |
+| [TypeScript Reviewer](agents/typescript-reviewer.md) | sonnet | TypeScript-specialized review — types, hooks, RTK Query, Next.js, Effect-TS |
+| [Security Reviewer](agents/security-reviewer.md) | sonnet | Deep security review — OWASP, auth, secrets, adversarial threat modeling |
+| [Infra Reviewer](agents/infra-reviewer.md) | sonnet | Infrastructure review — Terraform, Helm, K8s, Docker, CI/CD |
+| [Performance Reviewer](agents/performance-reviewer.md) | sonnet | Performance review — N+1 queries, complexity, memory, scaling |
 
 ## Knowledge
 
@@ -93,6 +98,11 @@ Is this a hard decision with multiple valid options?
 | [Decision Frameworks](knowledge/decision-frameworks.md) | How superpowered professionals make decisions — stakes matrix, tradeoff evaluation, when to ask for help |
 | [Critical Evaluation](knowledge/critical-evaluation.md) | Evidence-based evaluation, uncertainty as information, priority triage |
 | [Strategic Decomposition](knowledge/strategic-decomposition.md) | Breaking complex work into steps — top-down decomposition, dependency ordering, the 90/10 split |
+| [Infrastructure Ops](knowledge/infrastructure-ops.md) | Terraform/Helm/K8s validation pipelines, debugging patterns, Dockerfile best practices |
+| [Security Review](knowledge/security-review.md) | OWASP Top 10, auth patterns, secret management, input validation, adversarial modeling |
+| [Python & FastAPI](knowledge/python-fastapi-patterns.md) | FastAPI, Pydantic, SQLAlchemy async, type hints, async/await correctness |
+| [TypeScript & Next.js](knowledge/typescript-nextjs-patterns.md) | Next.js 15, React 19, RTK Query, Effect-TS, Drizzle ORM, strict TypeScript |
+| [Observability](knowledge/observability.md) | PromQL, LogQL, Grafana dashboards, alerting rules, SLO/SLI patterns |
 
 ## Disclaimer
 

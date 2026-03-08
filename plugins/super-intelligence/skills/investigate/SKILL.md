@@ -55,6 +55,16 @@ All three work the same case. Each sees what the others miss.
 
 ## Method
 
+**Auto-load relevant knowledge based on investigation context:**
+- Code polarity + `.py` files → Read `../knowledge/python-fastapi-patterns.md`
+- Code polarity + `.ts`/`.tsx` files → Read `../knowledge/typescript-nextjs-patterns.md`
+- System polarity → Read `../knowledge/infrastructure-ops.md` + `../knowledge/observability.md`
+- Performance polarity → Read `../knowledge/observability.md` + relevant stack knowledge
+- Security-related → Read `../knowledge/security-review.md`
+- Also search the project's `docs/operators/runbooks/` for matching runbooks when investigating system issues
+
+Load the knowledge BEFORE starting the investigation. Apply its patterns alongside the detective methodology.
+
 ### Phase 1: Survey the Scene (Poirot)
 
 *"I do not leap to the conclusions. First, I observe."*

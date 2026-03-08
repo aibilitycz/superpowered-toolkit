@@ -60,6 +60,16 @@ Auto-detect what's being reviewed based on the input:
 **Entry:** Review type known.
 **Exit:** Conventions loaded, risk areas identified, related plan/brainstorm read.
 
+**Auto-load relevant knowledge based on file types in the diff:**
+- `.py` files → Read `../knowledge/python-fastapi-patterns.md`
+- `.ts`/`.tsx` files → Read `../knowledge/typescript-nextjs-patterns.md`
+- `.tf`/`.hcl` files → Read `../knowledge/infrastructure-ops.md`
+- `.yaml` in k8s/helm paths → Read `../knowledge/infrastructure-ops.md`
+- `.github/` or `Dockerfile` → Read `../../super-creation/knowledge/ci-cd-patterns.md`
+- Auth/security-related code → Read `../knowledge/security-review.md`
+
+Load the knowledge BEFORE starting the review. The patterns in these files supplement your base review methodology.
+
 Before reviewing, understand what "correct" looks like:
 
 1. **Read the project's CLAUDE.md** for conventions and patterns
@@ -71,6 +81,16 @@ Before reviewing, understand what "correct" looks like:
 
 **Entry:** Context gathered, diff/document available.
 **Exit:** Findings documented with evidence and severity.
+
+**Auto-route to specialized reviewer based on diff content:**
+- \>70% `.py` files → launch **python-reviewer** agent (instead of strategic-reviewer)
+- \>70% `.ts`/`.tsx` files → launch **typescript-reviewer** agent
+- Security-sensitive changes (auth, secrets, validation) → launch **security-reviewer** agent (in addition to stack reviewer)
+- Infrastructure files (`.tf`, `.yaml`, Helm, k8s) → launch **infra-reviewer** agent
+- Performance-tagged or query-heavy changes → launch **performance-reviewer** agent
+- Mixed or unclear → launch **strategic-reviewer** (generalist, the default)
+
+**If unsure which reviewer:** Use strategic-reviewer. One good review beats a wrong specialist. The strategic-reviewer also handles code reviews with loaded knowledge — it doesn't need a specialist for every PR.
 
 #### Code Review
 

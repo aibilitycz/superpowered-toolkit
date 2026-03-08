@@ -9,31 +9,31 @@
       "name": "super-perception",
       "source": "./plugins/super-perception",
       "description": "Discovery, brainstorming, and problem reframing — see what others miss before building.",
-      "version": "0.1.0"
+      "version": "0.3.0"
     },
     {
       "name": "super-intelligence",
       "source": "./plugins/super-intelligence",
-      "description": "Strategic planning, deep thinking, focused review, and detective investigation — 4 skills, 2 agents.",
-      "version": "0.1.0"
+      "description": "Strategic planning, deep thinking, focused review, and detective investigation — 4 skills, 7 agents, 8 knowledge files.",
+      "version": "0.3.0"
     },
     {
       "name": "super-knowledge",
       "source": "./plugins/super-knowledge",
-      "description": "Knowledge compounding, context engineering, and expert psychometric knowledge — 4 skills, 3 agents, 9 domains.",
-      "version": "0.1.0"
+      "description": "Knowledge compounding, context engineering, and expert psychometric knowledge — 4 skills, 4 agents, 9 domains.",
+      "version": "0.3.0"
     },
     {
       "name": "super-creation",
       "source": "./plugins/super-creation",
       "description": "Execute plans from start to ship — AI does 90%, you craft the 10%.",
-      "version": "0.1.0"
+      "version": "0.3.0"
     },
     {
       "name": "super-integration",
       "source": "./plugins/super-integration",
       "description": "Cross-plugin workflow orchestration — brainstorm to plan to work to review to compound.",
-      "version": "0.1.0"
+      "version": "0.3.0"
     }
   ]
 }
