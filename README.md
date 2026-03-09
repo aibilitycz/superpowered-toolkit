@@ -123,9 +123,21 @@ See [METHODOLOGY.md](METHODOLOGY.md) for the meta-framework and [CONTRIBUTING.md
 
 ## Compatibility
 
-**Claude Code** — full support. Plugins install via the marketplace and load automatically. `AGENTS.md` provides tool-agnostic project guidance.
+**Claude Code** — full support. Plugins install via the marketplace and load automatically.
 
-**Cursor / Windsurf / GitHub Copilot** — partial. These tools read `AGENTS.md` for project conventions and code style. The knowledge files (plain markdown) can be referenced manually. However, the structured skill workflows (phases, tool permissions, entry/exit criteria) are Claude Code-specific.
+**Cursor** — supported via converter. Run the converter to generate Cursor-compatible rules and skills:
+
+```bash
+python scripts/convert-to-cursor.py --output /path/to/project/.cursor
+```
+
+This generates:
+- `.cursor/rules/` — agent rules (`.mdc`), composite plugin rules, glob-scoped language rules
+- `.cursor/skills/` — skills with all referenced knowledge inlined (self-contained)
+
+The converter inlines knowledge files directly into skills and creates composite rules per plugin, so Cursor gets the full domain expertise without needing Claude Code's on-demand loading.
+
+**Windsurf / GitHub Copilot** — `AGENTS.md` provides tool-agnostic project guidance. Skills can be manually copied to the tool's skill directory.
 
 ## Acknowledgments
 
