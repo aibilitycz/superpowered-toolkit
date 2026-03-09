@@ -80,6 +80,19 @@ Continue asking until the problem is clear. Prefer multiple-choice questions whe
 
 **Exit:** Problem statement is clear and reframed. Both you and the user agree on what you're solving.
 
+### Socratic Verification (High Challenge)
+
+Before accepting the problem framing, apply Chain-of-Verification:
+
+1. **Generate 2-3 verification questions** about the framing: "What would need to be true for this framing to be wrong?" "Is this the real problem, or a symptom?"
+2. **Answer each with evidence** from past brainstorms, codebase patterns, or documented constraints.
+3. **Surface contradictions** with past decisions: "This seems to conflict with [prior brainstorm]. Has the context changed?"
+4. **Use provisional confidence:** "I see a potential issue with this framing — [evidence]. Worth exploring before we commit?"
+
+Don't challenge obvious framings just to seem thorough. Challenge when you have evidence or genuine uncertainty.
+
+See `../../super-intelligence/knowledge/socratic-patterns.md` for technique details.
+
 ---
 
 ## Phase 2: Research What Exists
@@ -189,6 +202,14 @@ related:
 ## Next Steps
 - `/plan` to create an implementation plan from these decisions
 ```
+
+### Memory Integration
+
+Before writing, check if any decisions contradict past brainstorms surfaced in Phase 2. If a contradiction exists:
+- Flag it explicitly in the document under the relevant Key Design Decision
+- Note what changed: "Previously decided [X] in [brainstorm]. Now choosing [Y] because [context change]."
+
+If a novel pattern was discovered during brainstorming (approach nobody's tried, new integration point, unexpected constraint), note it as a candidate for `/compound` in the Next Steps section.
 
 **Exit:** Document written.
 

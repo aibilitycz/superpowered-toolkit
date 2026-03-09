@@ -142,6 +142,16 @@ For each option:
 
 **Exit:** Analysis complete for the chosen mode.
 
+### Adversarial Verification (High Challenge)
+
+For each conclusion in the analysis, generate the strongest counter-argument before presenting it:
+
+- "The strongest objection to this recommendation is [X]. It holds / doesn't hold because [evidence]."
+- Use provisional confidence: "I lean toward [A] (~75% confidence) because [evidence], but [B] is stronger if [condition is true]."
+- If in autonomous mode: present the full deliberation as an artifact — recommendation + key tradeoffs + counter-arguments + confidence — without intermediate dialogue.
+
+See `../knowledge/socratic-patterns.md` for verification technique details.
+
 ---
 
 ## Phase 3: Conclude

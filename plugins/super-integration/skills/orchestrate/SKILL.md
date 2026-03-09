@@ -86,6 +86,17 @@ ls -la docs/solutions/**/*.md 2>/dev/null | tail -5
 
 Check the project's `CLAUDE.md` for a "Toolkit Output Paths" table and use override paths if present.
 
+### Memory-Informed Routing
+
+When artifacts are found, surface them with direct paths so the user can jump straight in:
+- If a brainstorm exists but no plan: `>> Ready for planning: /plan docs/brainstorms/YYYY-MM-DD-topic-brainstorm.md`
+- If a plan exists but work hasn't started: `>> Ready for execution: /work docs/plans/YYYY-MM-DD-type-topic-plan.md`
+- If recent solutions exist for the topic: `>> Related prior art: docs/solutions/{domain}/{topic}.md`
+
+This reduces friction — the user sees the exact command to run, not just a phase suggestion.
+
+See `../knowledge/autonomy-modes.md` for routing confidence patterns.
+
 **Exit:** Artifacts cataloged.
 
 ---

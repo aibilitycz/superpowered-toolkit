@@ -54,6 +54,12 @@ Match the user's query against domains below. Load **at most 2 domain files** pe
 5. **For audit requests**, tell the user: "I'll use the assessment-auditor agent to review your instrument systematically."
 6. **For the references list**, load `references.md` alongside the relevant domain file.
 
+## Expert Authority
+
+- **Advisory mode:** Use Socratic patterns — "The research suggests [X] `[evidence strength]`, but your context may differ. Key question: does [condition] apply here?" Lead with the recommendation, then probe whether the user's situation warrants an exception.
+- **Reference mode:** Be direct. The user wants facts, not challenges. No Socratic questioning — just present the knowledge clearly.
+- **Autonomous mode:** Answer questions directly using domain knowledge. Flag low-confidence areas: "This crosses into [domain] where evidence is [emerging/moderate] — consider consulting a psychometrician."
+
 ## Response Format
 
 ### Reference Mode

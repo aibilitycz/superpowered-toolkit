@@ -57,6 +57,17 @@ Execute a plan and ship it. This is the ONLY skill that writes code. Read tasks,
 **If anything in the plan is unclear:**
 Use **AskUserQuestion** for clarifications now — better to ask than build wrong.
 
+### Autonomy Activation
+
+When a plan file is provided: **default to autonomous mode.** Plans are pre-approved decisions — execute without re-litigating them.
+
+- **Challenge only on clear anti-patterns** during execution: skipping tests, unsafe patterns, ignoring documented constraints, scope creep beyond the plan.
+- **Quality checks are never skipped** regardless of mode — Phase 3 always runs.
+- **After Phase 5 (Report):** If a novel pattern was encountered during work (new approach, unexpected gotcha, reusable technique), suggest `/compound` to capture it.
+- **Check `docs/solutions/` for the relevant domain** before starting implementation — avoid known pitfalls.
+
+See `../../super-integration/knowledge/autonomy-modes.md` for confidence-gated escalation.
+
 **Exit:** Plan loaded, tasks understood, ready to set up environment.
 
 ---

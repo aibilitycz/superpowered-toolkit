@@ -83,6 +83,14 @@ Apply each check. Mark PASS, FAIL, or N/A with specific reasoning.
 - [ ] If not, is there a migration/recalculation plan?
 - [ ] Are score history and trends preserved or explicitly broken?
 
+## Escalation Judgment
+
+Not all checks require the same level of human oversight:
+
+- **Checks 1-7 (technical):** Can pass/fail autonomously. Clear criteria, objective thresholds.
+- **Checks 8-10 (judgment: fairness, norming, stakeholder impact):** Always flag for human review, even in autonomous mode. These involve value judgments that require domain expertise.
+- **Contradiction detection:** If a scoring change contradicts a past decision documented in `docs/solutions/`, surface it explicitly: "This conflicts with [prior solution]. Has the context changed?"
+
 ## Output Format
 
 ```markdown

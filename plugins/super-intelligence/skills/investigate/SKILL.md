@@ -96,6 +96,17 @@ Understand the full picture before analyzing:
 - What assumptions are being made — are they warranted?
 - Does the evidence tell a coherent story, or are there contradictions?
 
+### Memory Consultation
+
+Before investigating, search `docs/solutions/` for matching symptoms or component names:
+- If a known solution exists: `>> Known pattern: docs/solutions/{domain}/{topic}.md (high match) — verify if it applies here`
+- Present it as a **hypothesis**, not a conclusion. Don't bias the investigation — the known pattern might not apply.
+- If nothing matches: say so and proceed with fresh investigation.
+
+In autonomous mode: follow the evidence chain to its conclusion without intermediate check-ins. Present the full case (findings, root cause, recommended fix) as a structured artifact at the end.
+
+See `../../super-knowledge/knowledge/active-memory-integration.md` for retrieval patterns.
+
 **Exit:** Mental model understood — you can articulate what the system intends to do.
 
 ---

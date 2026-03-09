@@ -80,6 +80,15 @@ Search docs/solutions/, CLAUDE.md, knowledge/ for:
 
 Principle: **update > create.** Don't create parallel docs that drift.
 
+### Intelligent Capture
+
+After the duplicate check, apply capture heuristics:
+- **Similar solution, different root cause:** Create a new doc, cross-reference the existing one in `related:` frontmatter.
+- **Trivial fix** (typo, config error, one-line change): Suggest a memory note (CLAUDE.md or auto-memory) instead of a full solution doc. The 15-minute rule: if it took less than 15 minutes, it's probably not worth a full doc.
+- **Novel pattern** (new approach, integration point, unexpected constraint): Create a full solution doc — this is exactly what compounding is for.
+
+In autonomous mode: make the capture decision using these heuristics, document the reasoning in the output. Skip AskUserQuestion for clear-cut cases (obvious duplicate → update, obvious novel → create).
+
 **Exit:** Confirmed new or updating existing.
 
 ---

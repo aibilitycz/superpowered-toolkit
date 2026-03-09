@@ -79,6 +79,20 @@ Then gather project context:
 
 **Exit:** Conventions loaded, risk areas identified, related context read.
 
+### Evidence-Grounded Challenge (High Challenge)
+
+Before starting the review, check `docs/solutions/` for recurring issues in the same component or domain. If this is a known problem area, note it.
+
+During the review, apply CoVe to each Critical finding before reporting it:
+- "What would disprove this finding?" — If you can't construct a scenario where this code is correct, the finding is solid.
+- "Is this a real bug or a style preference?" — Only Critical findings that have failure scenarios.
+
+After the review, check: if the same issue has appeared 3+ times across reviews, suggest adding it to the project's CLAUDE.md or `docs/solutions/`.
+
+In autonomous mode (e.g., review triggered as part of a workflow): complete the full review, present all findings as a structured artifact without intermediate check-ins. Append a decision log if any judgment calls were made.
+
+See `../knowledge/socratic-patterns.md` for CoVe technique details.
+
 ---
 
 ## Phase 3: Review
@@ -223,3 +237,5 @@ Use **AskUserQuestion** with:
 
 - `../knowledge/critical-evaluation.md` — Evidence-based evaluation, uncertainty flagging
 - `../agents/strategic-reviewer.md` — The default code review agent
+- `../knowledge/socratic-patterns.md` — CoVe technique for verifying findings
+- `../../super-knowledge/knowledge/active-memory-integration.md` — Memory read/write patterns

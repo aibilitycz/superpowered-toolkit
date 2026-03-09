@@ -95,7 +95,25 @@ Launch research **in parallel**:
 **If external research is needed:**
 Announce the decision and proceed: "This involves payment processing — researching current best practices before planning."
 
+### Active Memory
+
+Search past plans for similar features. Surface proven patterns and past risks:
+- If a past plan for a similar feature exists, reference it: `>> Prior plan: docs/plans/YYYY-MM-DD-feat-x.md (similar scope)`
+- Note what worked and what was risky in the prior implementation
+- If a past plan's approach was abandoned or caused issues, flag it: "Previous plan [X] hit [problem]. Consider [alternative]."
+
+See `../../super-knowledge/knowledge/active-memory-integration.md` for retrieval patterns.
+
 **Exit:** Codebase patterns known, past solutions surfaced, constraints identified.
+
+### Autonomy Gate (Medium Challenge)
+
+After calibrating detail level, decide whether to proceed autonomously or interactively:
+
+- **Autonomous** (brainstorm exists AND confidence is high): Proceed to Phase 4 without asking the user about detail level. State the level and reasoning, then write.
+- **Interactive** (no brainstorm AND multiple valid approaches): Explore the approach with the user before writing. Use Socratic questioning: "Have you considered [alternative]? It trades [X] for [Y]."
+
+See `../../super-integration/knowledge/autonomy-modes.md` for detection heuristics.
 
 ---
 

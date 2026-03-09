@@ -55,6 +55,14 @@ Is faking a concern? (high-stakes selection, promotion)
 
 Present the recommendation with rationale. If the user disagrees, note the tradeoffs but follow their choice.
 
+### Design Challenge
+
+Before accepting the format choice, surface the key tradeoff for the user's context:
+- "MFC resists faking but reduces reliability for small n. Is that acceptable for your population size?"
+- "Likert is simpler to develop but vulnerable to response style bias. How high-stakes is this assessment?"
+- Check past items in the project for format consistency — flag if the new item diverges from established patterns.
+- In autonomous mode: make format selection using the decision tree above, log the rationale.
+
 ### Step 3: Item Drafting
 
 Write items following format-specific principles:
