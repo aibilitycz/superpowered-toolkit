@@ -88,6 +88,10 @@ python3 -c "import elevenlabs" 2>/dev/null || uv pip install --system --break-sy
 below use raw MP3 byte concatenation instead — MP3 is a frame-based format and files can be
 concatenated directly.
 
+**IMPORTANT:** On Python 3.14+, `client.text_to_speech.convert()` returns a **generator**, not
+bytes. All scripts below use a `to_bytes()` helper to normalize this. Never call `f.write(audio)`
+directly — always wrap with `to_bytes(audio)` first.
+
 ### Step 3: Verify Connection
 
 ```bash
@@ -106,6 +110,10 @@ for v in voices.voices[:10]:
 "
 ```
 
+**CRITICAL:** Voice IDs are **account-specific**. Never hardcode voice IDs from examples or
+documentation — always run Step 3 first to discover the actual IDs available on the user's
+account. The same voice name (e.g., "Alice") may have a different ID across accounts.
+
 **Exit:** Auth verified, SDK installed, voices listed.
 
 ## Phase 1: Quick Text-to-Speech
@@ -120,25 +128,29 @@ Write this script to a temp file and execute:
 import os
 from elevenlabs.client import ElevenLabs
 
-# --- CONFIG (Claude fills these) ---
+# --- CONFIG (Claude fills these — run Phase 0 Step 3 to list voice IDs) ---
 TEXT = """Your text here."""
-VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"          # George - Warm Storyteller
+VOICE_ID = "FILL_FROM_VOICE_LIST"            # Run voice list first!
 MODEL_ID = "eleven_multilingual_v2"           # See model table below
 OUTPUT_FORMAT = "mp3_44100_128"
 OUTPUT_PATH = "output.mp3"
 # --- END CONFIG ---
+
+def to_bytes(audio) -> bytes:
+    """Normalize convert() output — returns bytes on <3.14, generator on >=3.14."""
+    return audio if isinstance(audio, bytes) else b"".join(audio)
 
 key_file = os.path.expanduser("~/.elevenlabs/api_key")
 api_key = open(key_file).read().strip() if os.path.exists(key_file) else os.environ["ELEVENLABS_API_KEY"]
 client = ElevenLabs(api_key=api_key)
 
 print(f"Generating {len(TEXT)} chars with {MODEL_ID}...")
-audio = client.text_to_speech.convert(
+audio = to_bytes(client.text_to_speech.convert(
     text=TEXT,
     voice_id=VOICE_ID,
     model_id=MODEL_ID,
     output_format=OUTPUT_FORMAT,
-)
+))
 
 with open(OUTPUT_PATH, "wb") as f:
     f.write(audio)
@@ -170,7 +182,7 @@ previous_text continuity, concatenates MP3 bytes directly.
 import os
 from elevenlabs.client import ElevenLabs
 
-# --- CONFIG ---
+# --- CONFIG (Claude fills these — run Phase 0 Step 3 to list voice IDs) ---
 SCRIPT = """
 Your podcast script here.
 
@@ -178,11 +190,15 @@ Split into paragraphs with blank lines.
 
 Each paragraph becomes natural speech.
 """
-VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"          # George - Warm Storyteller
+VOICE_ID = "FILL_FROM_VOICE_LIST"            # Run voice list first!
 MODEL_ID = "eleven_multilingual_v2"
 OUTPUT_PATH = "podcast.mp3"
 CHUNK_SIZE = 4500                             # chars per API call (leave margin under 5k/10k limit)
 # --- END CONFIG ---
+
+def to_bytes(audio) -> bytes:
+    """Normalize convert() output — returns bytes on <3.14, generator on >=3.14."""
+    return audio if isinstance(audio, bytes) else b"".join(audio)
 
 key_file = os.path.expanduser("~/.elevenlabs/api_key")
 api_key = open(key_file).read().strip() if os.path.exists(key_file) else os.environ["ELEVENLABS_API_KEY"]
@@ -204,24 +220,24 @@ if current:
 print(f"Script: {len(SCRIPT)} chars -> {len(chunks)} chunks")
 
 # Generate silence for pauses (one short phrase, reuse the bytes)
-silence = client.text_to_speech.convert(
+silence = to_bytes(client.text_to_speech.convert(
     text="...",
     voice_id=VOICE_ID,
     model_id=MODEL_ID,
     output_format="mp3_44100_128",
-)
+))
 
 # Generate and concatenate
 audio_parts = []
 for i, chunk in enumerate(chunks):
     print(f"  [{i+1}/{len(chunks)}] {len(chunk)} chars: {chunk[:50]}...")
-    audio_bytes = client.text_to_speech.convert(
+    audio_bytes = to_bytes(client.text_to_speech.convert(
         text=chunk,
         voice_id=VOICE_ID,
         model_id=MODEL_ID,
         output_format="mp3_44100_128",
         previous_text=chunks[i - 1][-200:] if i > 0 else None,
-    )
+    ))
     audio_parts.append(audio_bytes)
     if i < len(chunks) - 1:
         audio_parts.append(silence)
@@ -246,19 +262,22 @@ concatenates MP3 bytes with silence pauses between speakers.
 import os
 from elevenlabs.client import ElevenLabs
 
-# --- CONFIG ---
+# --- CONFIG (Claude fills these — run Phase 0 Step 3 to list voice IDs) ---
 SEGMENTS = [
     # (voice_id, text)
-    # George - Warm Storyteller (host)
-    ("JBFqnCBsd6RMkjVDRZzb", "Welcome to the show. Today we're talking about..."),
-    # Alice - Clear Educator (co-host)
-    ("Xb7hH8MSUJpSdBMzjjln", "Thanks for having me. Let's dive into the science."),
-    ("JBFqnCBsd6RMkjVDRZzb", "So how does this actually work?"),
-    ("Xb7hH8MSUJpSdBMzjjln", "Great question. It starts with..."),
+    # Voice IDs are account-specific! Always run the voice list first.
+    ("VOICE_ID_HOST", "Welcome to the show. Today we're talking about..."),
+    ("VOICE_ID_GUEST", "Thanks for having me. Let's dive into the science."),
+    ("VOICE_ID_HOST", "So how does this actually work?"),
+    ("VOICE_ID_GUEST", "Great question. It starts with..."),
 ]
 MODEL_ID = "eleven_multilingual_v2"
 OUTPUT_PATH = "dialogue-podcast.mp3"
 # --- END CONFIG ---
+
+def to_bytes(audio) -> bytes:
+    """Normalize convert() output — returns bytes on <3.14, generator on >=3.14."""
+    return audio if isinstance(audio, bytes) else b"".join(audio)
 
 # Voice name lookup for logging
 VOICE_NAMES = {}
@@ -275,12 +294,12 @@ except Exception:
     pass
 
 # Generate silence for pauses
-silence = client.text_to_speech.convert(
+silence = to_bytes(client.text_to_speech.convert(
     text="...",
     voice_id=SEGMENTS[0][0],
     model_id=MODEL_ID,
     output_format="mp3_44100_128",
-)
+))
 
 print(f"Generating {len(SEGMENTS)} segments...")
 
@@ -290,12 +309,12 @@ for i, (voice_id, text) in enumerate(SEGMENTS):
     preview = text[:60].replace("\n", " ")
     print(f"  [{i+1}/{len(SEGMENTS)}] {name}: {preview}...")
 
-    audio_bytes = client.text_to_speech.convert(
+    audio_bytes = to_bytes(client.text_to_speech.convert(
         text=text,
         voice_id=voice_id,
         model_id=MODEL_ID,
         output_format="mp3_44100_128",
-    )
+    ))
     audio_parts.append(audio_bytes)
     if i < len(SEGMENTS) - 1:
         audio_parts.append(silence)
