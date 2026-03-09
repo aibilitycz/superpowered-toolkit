@@ -16,9 +16,10 @@
     "work",
     "release-notes",
     "continuous-delivery",
-    "elevenlabs",
     "audio",
     "podcast",
-    "tts"
+    "tts",
+    "elevenlabs",
+    "voice"
   ]
 }

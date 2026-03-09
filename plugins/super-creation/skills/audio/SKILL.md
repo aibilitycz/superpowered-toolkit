@@ -1,11 +1,11 @@
 ---
-name: elevenlabs
+name: audio
 description: >
-  Generate audio content using ElevenLabs — text-to-speech, podcasts, voice cloning,
-  sound effects, speech-to-speech, dubbing, and audio isolation. Works with both the
-  Python SDK and the ElevenLabs CLI. Includes ready-to-run generator scripts that
-  Claude writes to a temp file and executes directly.
-  Triggers: elevenlabs, text-to-speech, TTS, podcast, voice, audio, voiceover,
+  Generate audio content — text-to-speech, podcasts, voice cloning, sound effects,
+  speech-to-speech, dubbing, and audio isolation. Currently powered by ElevenLabs.
+  Works with both the Python SDK and the ElevenLabs CLI. Includes ready-to-run
+  generator scripts that Claude writes to a temp file and executes directly.
+  Triggers: audio, elevenlabs, text-to-speech, TTS, podcast, voice, voiceover,
   narration, voice clone, sound effects, dubbing, speech-to-speech, audio isolation.
 allowed-tools:
   - Read
@@ -16,10 +16,10 @@ allowed-tools:
   - Edit
 ---
 
-# ElevenLabs Audio Production
+# Audio Production
 
-Generate audio with ElevenLabs — from single-line TTS to multi-voice podcasts. This skill
-includes ready-to-run Python scripts. Claude writes them to a temp file and executes directly.
+Generate audio — from single-line TTS to multi-voice podcasts. Currently powered by ElevenLabs.
+Includes ready-to-run Python scripts. Claude writes them to a temp file and executes directly.
 
 ## Boundaries
 
