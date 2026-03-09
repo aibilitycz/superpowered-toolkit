@@ -21,6 +21,7 @@ superpowered-toolkit/
 
 **Read `METHODOLOGY.md` first** — it defines the methodology anchor rule and plugin quality standards.
 **Read `CONVENTIONS.md`** — shared conventions for file naming, frontmatter, and cross-references.
+**Read `@AGENTS.md`** — tool-agnostic project guidance (works with Cursor, Copilot, and other AI tools too).
 
 ## Key Rules
 

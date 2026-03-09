@@ -100,13 +100,32 @@ Skills aren't just prompts — they're structured workflows with:
 - **Entry/exit criteria** — every workflow phase has explicit gates
 - **Confidence calibration** — skills declare when they're uncertain
 
-See [METHODOLOGY.md](METHODOLOGY.md) for the meta-framework, [AGENTS.md](AGENTS.md) for the agent registry, and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+See [METHODOLOGY.md](METHODOLOGY.md) for the meta-framework and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+## Agents
+
+12 specialized subagents across 3 plugins. Agents run as read-only subprocesses for research, review, and analysis.
+
+| Agent | Plugin | Purpose |
+|-------|--------|---------|
+| researcher | super-perception | Codebase, docs, and solution scanning for discovery |
+| strategic-reviewer | super-intelligence | Focused code review with Critical Trust |
+| investigator | super-intelligence | Evidence-trail detective for root causes and bugs |
+| python-reviewer | super-intelligence | Python type safety, async, Pydantic, FastAPI patterns |
+| typescript-reviewer | super-intelligence | TypeScript narrowing, hooks, RTK Query, Drizzle patterns |
+| security-reviewer | super-intelligence | OWASP Top 10, auth, secrets, threat modeling |
+| infra-reviewer | super-intelligence | Terraform/OpenTofu, Helm, K8s, Dockerfiles, CI/CD |
+| performance-reviewer | super-intelligence | N+1 queries, complexity, memory, scaling, SLOs |
+| knowledge-architect | super-knowledge | Build and maintain structured knowledge docs |
+| psychometry-expert | super-knowledge | Deep cross-domain psychometric analysis (3+ domains) |
+| assessment-auditor | super-knowledge | Autonomous instrument review (items, scoring, rubrics) |
+| skill-reviewer | super-knowledge | Grade skills/agents A-F against quality bar |
 
 ## Compatibility
 
-**Claude Code** — full support. Plugins install via the marketplace and load automatically.
+**Claude Code** — full support. Plugins install via the marketplace and load automatically. `AGENTS.md` provides tool-agnostic project guidance.
 
-**Cursor / Windsurf / other AI editors** — not directly compatible. These tools use different configuration formats (`.cursorrules`, etc.). The knowledge files are plain markdown and can be referenced manually, but the structured skill workflows (phases, tool permissions, entry/exit criteria) are Claude Code-specific.
+**Cursor / Windsurf / GitHub Copilot** — partial. These tools read `AGENTS.md` for project conventions and code style. The knowledge files (plain markdown) can be referenced manually. However, the structured skill workflows (phases, tool permissions, entry/exit criteria) are Claude Code-specific.
 
 ## Disclaimer
 

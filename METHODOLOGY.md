@@ -147,9 +147,10 @@ Example: The psychometric toolkit recommends equal weights as the default compos
 |-------|--------|-------|--------|
 | v0.2 | `psychometric-ai-toolkit` | MEASURE | Absorbed into `super-knowledge` |
 | v0.3 | 5 superpower plugins | BUILD | Shipped — perception, intelligence, knowledge, creation, integration |
-| v0.4 | `sp-methodology` | GOVERN | Planned — move from aimee-product |
-| v0.5 | Cursor converter | — | Planned — multi-environment support |
-| v1.0 | Official Anthropic marketplace submission | — | After v0.3 |
+| v0.4 | Interaction quality & autonomy | BUILD | Shipped — socratic challenge, adaptive autonomy, active memory, AGENTS.md |
+| v0.5 | `sp-methodology` | GOVERN | Planned — move from aimee-product |
+| v0.6 | Cursor/Copilot compatibility | — | Planned — AGENTS.md-based multi-environment support |
+| v1.0 | Official Anthropic marketplace submission | — | After v0.5 |
 | Future | `assessment-builder` | BUILD | Assessment config patterns |
 | Future | `coaching-advisor` | DEVELOP | Growth paths per sub-competency |
 | Future | `calibration-ops` | MEASURE | Production monitoring |
