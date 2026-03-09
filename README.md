@@ -125,15 +125,17 @@ See [METHODOLOGY.md](METHODOLOGY.md) for the meta-framework and [CONTRIBUTING.md
 
 **Claude Code** — full support. Plugins install via the marketplace and load automatically.
 
-**Cursor** — supported via converter. Run the converter to generate Cursor-compatible rules and skills:
+**Cursor** — one command installs rules and skills into your project:
 
 ```bash
-python scripts/convert-to-cursor.py --output /path/to/project/.cursor
+# From your project root:
+npx @aibilityorg/superpowered-toolkit install --to cursor
+
+# Or with bun:
+bunx @aibilityorg/superpowered-toolkit install --to cursor
 ```
 
-This generates:
-- `.cursor/rules/` — agent rules (`.mdc`), composite plugin rules, glob-scoped language rules
-- `.cursor/skills/` — skills with all referenced knowledge inlined (self-contained)
+This generates `.cursor/rules/` (21 agent rules, composite plugin rules, glob-scoped language rules) and `.cursor/skills/` (12 skills with all referenced knowledge inlined). Works on Mac, Linux, and Windows.
 
 The converter inlines knowledge files directly into skills and creates composite rules per plugin, so Cursor gets the full domain expertise without needing Claude Code's on-demand loading.
 

@@ -1,0 +1,41 @@
+{
+  "name": "@aibilityorg/superpowered-toolkit",
+  "version": "0.5.0",
+  "description": "5 AI-powered plugins for Claude Code — discovery, planning, review, execution, and orchestration. Install to Cursor, Claude Code, and more.",
+  "bin": {
+    "superpowered-toolkit": "bin/cli.js",
+    "sp-toolkit": "bin/cli.js"
+  },
+  "type": "module",
+  "license": "MIT",
+  "author": {
+    "name": "aibility",
+    "url": "https://github.com/aibilitycz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aibilitycz/superpowered-toolkit.git"
+  },
+  "keywords": [
+    "claude-code",
+    "cursor",
+    "ai-plugins",
+    "superpowered-professional",
+    "psychometrics",
+    "code-review",
+    "planning"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin/",
+    "plugins/",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "METHODOLOGY.md",
+    "CONVENTIONS.md",
+    "README.md",
+    "LICENSE"
+  ]
+}
