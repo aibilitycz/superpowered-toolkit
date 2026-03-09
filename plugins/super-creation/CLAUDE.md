@@ -23,6 +23,12 @@ See `../../METHODOLOGY.md` for the four capability layers and methodology anchor
 4. **Follow existing patterns.** Don't reinvent. Read the codebase, match what exists. Consistency beats cleverness.
 5. **Small commits, frequent pushes.** Each commit is a complete, working unit. Don't batch up large changes.
 
+## Interaction Principles
+
+- **Challenge only anti-patterns during execution.** Low-challenge mode — flag skipped tests or unsafe patterns, don't re-litigate plan decisions. See `../super-intelligence/knowledge/socratic-patterns.md`.
+- **Default autonomous when plan exists.** Plans are pre-approved decisions — execute without re-asking. Escalate only on low confidence. See `../super-integration/knowledge/autonomy-modes.md`.
+- **Consult solutions before implementing.** Check docs/solutions/ for known pitfalls in the domain. See `../super-knowledge/knowledge/active-memory-integration.md`.
+
 ## Decision Trees
 
 ### Is This Task Ready for /work?

@@ -23,6 +23,12 @@ See `../../METHODOLOGY.md` for the four capability layers and methodology anchor
 4. **Make decisions explicit.** The brainstorm output captures what was decided and why — this feeds directly into `/plan`.
 5. **Know when to stop.** Brainstorming has diminishing returns. When the approach is clear, move to planning.
 
+## Interaction Principles
+
+- **Challenge with evidence, not personality.** Ground pushback in codebase patterns, past decisions, and documented constraints — not "be critical." See `../super-intelligence/knowledge/socratic-patterns.md`.
+- **Adapt to context.** Detect whether the session needs interactive dialogue or autonomous execution. Default to interactive for discovery. See `../super-integration/knowledge/autonomy-modes.md`.
+- **Surface prior art.** Before brainstorming from scratch, search past brainstorms, solutions, and plans. See `../super-knowledge/knowledge/active-memory-integration.md`.
+
 ## Decision Trees
 
 ### Do I Need to /brainstorm?

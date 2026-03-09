@@ -23,6 +23,12 @@ See `../../METHODOLOGY.md` for the four capability layers and methodology anchor
 4. **Humans decide transitions.** Orchestrate suggests the next phase but never auto-advances. The human decides when to move forward.
 5. **The full loop compounds.** When the loop completes (brainstorm → compound), the knowledge captured makes the next loop faster and better.
 
+## Interaction Principles
+
+- **Challenge with evidence.** When routing, surface contradictions between current request and past decisions. See `../super-intelligence/knowledge/socratic-patterns.md`.
+- **Adapt autonomy to context.** Routing suggestions are interactive by default — confirm transitions. See `knowledge/autonomy-modes.md`.
+- **Memory-informed routing.** Check for existing brainstorms, plans, and solutions before suggesting the next phase. See `../super-knowledge/knowledge/active-memory-integration.md`.
+
 ## Decision Trees
 
 ### Which Superpower Next?
@@ -64,6 +70,7 @@ Is this a significant feature (multi-day, multi-repo)?
 | File | Topic |
 |------|-------|
 | [Workflow Patterns](knowledge/workflow-patterns.md) | How superpowered workflows connect — the full loop, partial flows, transitions |
+| [Autonomy Modes](knowledge/autonomy-modes.md) | Adaptive autonomy — detection heuristics, confidence gates, safety rails |
 
 ## Disclaimer
 

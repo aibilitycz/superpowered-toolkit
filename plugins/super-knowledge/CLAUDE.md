@@ -23,6 +23,12 @@ See `../../METHODOLOGY.md` for the four capability layers and methodology anchor
 4. **Context > syntax.** The right context makes AI dramatically more effective. Invest in context docs — they compound.
 5. **Evidence-grounded.** For domain knowledge (psychometrics, measurement), claims cite sources. No black boxes.
 
+## Interaction Principles
+
+- **Challenge with evidence.** Ground pushback in codebase patterns and past decisions. See `../super-intelligence/knowledge/socratic-patterns.md`.
+- **Adapt autonomy to context.** Compound captures are low-risk — default to autonomous. See `../super-integration/knowledge/autonomy-modes.md`.
+- **Read before writing.** Always check existing solutions for duplicates before capturing. Active memory at every boundary. See `knowledge/active-memory-integration.md`.
+
 ## Decision Trees
 
 ### Should I /compound This?
@@ -83,6 +89,7 @@ What's the question about?
 | [Context Engineering](knowledge/context-engineering.md) | How to build structured context for AI — types, versioning, the right granularity |
 | [Compounding Patterns](knowledge/compounding-patterns.md) | Knowledge compounding patterns — solution libraries, cross-references, retrieval |
 | [Psychometric References](knowledge/psychometric-references.md) | Master bibliography for psychometric domain files |
+| [Active Memory Integration](knowledge/active-memory-integration.md) | Read/write patterns, retrieval strategy, dedup rules for cross-session memory |
 
 ## Psychometric Domain
 

@@ -23,6 +23,12 @@ See `../../METHODOLOGY.md` for the four capability layers and methodology anchor
 4. **Uncertainty is signal.** Saying "I don't know" is more valuable than guessing. Flag what's uncertain and what would resolve it.
 5. **Simple until proven otherwise.** Start with the simplest approach. Add complexity only when you have evidence it's needed.
 
+## Interaction Principles
+
+- **Challenge with evidence.** Use CoVe and past-decision referencing, not persona prompts. See `knowledge/socratic-patterns.md`.
+- **Adapt autonomy to context.** Confidence-gated escalation: >85% act, 50-70% ask, <50% escalate. See `../super-integration/knowledge/autonomy-modes.md`.
+- **Consult memory.** Search past plans, reviews, and solutions before starting. See `../super-knowledge/knowledge/active-memory-integration.md`.
+
 ## Decision Trees
 
 ### How Much Detail in a Plan?
@@ -103,6 +109,7 @@ Is this a hard decision with multiple valid options?
 | [Python & FastAPI](knowledge/python-fastapi-patterns.md) | FastAPI, Pydantic, SQLAlchemy async, type hints, async/await correctness |
 | [TypeScript & Next.js](knowledge/typescript-nextjs-patterns.md) | Next.js 15, React 19, RTK Query, Effect-TS, Drizzle ORM, strict TypeScript |
 | [Observability](knowledge/observability.md) | PromQL, LogQL, Grafana dashboards, alerting rules, SLO/SLI patterns |
+| [Socratic Patterns](knowledge/socratic-patterns.md) | Evidence-based challenging — CoVe technique, question templates, calibration |
 
 ## Disclaimer
 
