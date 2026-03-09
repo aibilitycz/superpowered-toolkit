@@ -34,11 +34,11 @@ superpowered-toolkit/
 
 | Plugin | Superpower | Version | What It Does |
 |--------|-----------|---------|-------------|
-| [super-perception](plugins/super-perception/) | 1. Perception | 0.3.0 | `/brainstorm` — discovery, problem reframing, research |
-| [super-intelligence](plugins/super-intelligence/) | 2. Intelligence | 0.3.0 | `/plan`, `/review`, `/think`, `/investigate` — planning, review, reasoning, investigation |
-| [super-knowledge](plugins/super-knowledge/) | 3. Knowledge | 0.3.0 | `/compound` + psychometric domain (9 domains, 4 skills, 4 agents) |
-| [super-creation](plugins/super-creation/) | 4. Creation | 0.3.0 | `/work` — execute plans from start to ship |
-| [super-integration](plugins/super-integration/) | 5. Integration | 0.3.0 | `/orchestrate` — cross-plugin workflow conductor |
+| [super-perception](plugins/super-perception/) | 1. Perception | 0.4.0 | `/brainstorm` — discovery, problem reframing, research |
+| [super-intelligence](plugins/super-intelligence/) | 2. Intelligence | 0.4.0 | `/plan`, `/review`, `/think`, `/investigate` — planning, review, reasoning, investigation |
+| [super-knowledge](plugins/super-knowledge/) | 3. Knowledge | 0.4.0 | `/compound` + psychometric domain (9 domains, 4 skills, 4 agents) |
+| [super-creation](plugins/super-creation/) | 4. Creation | 0.4.1 | `/work`, `/audio` — execute plans, generate audio content |
+| [super-integration](plugins/super-integration/) | 5. Integration | 0.4.0 | `/orchestrate` — cross-plugin workflow conductor |
 
 ## The Full Loop
 
