@@ -127,6 +127,10 @@ See [METHODOLOGY.md](METHODOLOGY.md) for the meta-framework and [CONTRIBUTING.md
 
 **Cursor / Windsurf / GitHub Copilot** — partial. These tools read `AGENTS.md` for project conventions and code style. The knowledge files (plain markdown) can be referenced manually. However, the structured skill workflows (phases, tool permissions, entry/exit criteria) are Claude Code-specific.
 
+## Acknowledgments
+
+The skill and workflow architecture draws heavily from [Compound Engineering](https://github.com/EveryInc/compound-engineering-plugin) by Every Inc — particularly the phased skill design, rationalizations tables, AskUserQuestion patterns, and the converter approach for multi-editor support. The psychometric knowledge base builds on peer-reviewed research cited in each domain file.
+
 ## Disclaimer
 
 These tools provide guidance based on published research, not certification. For high-stakes assessment decisions (hiring, certification, clinical diagnosis), verify recommendations with a qualified professional.
