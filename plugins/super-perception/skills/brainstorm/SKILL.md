@@ -136,6 +136,43 @@ Use **AskUserQuestion** to ask one question at a time. Start broad (purpose, use
 - You've explored enough to choose (2-3 approaches with tradeoffs)
 - The user says "proceed" or equivalent
 
+### Assumption Audit (after approach is chosen)
+
+Once an approach is selected, run the Recursive Why loop before locking it in. This is mandatory — not optional.
+
+**The loop:**
+
+1. **Extract assumptions** — identify 3-5 things that must be true for this approach to work. These are often implicit: technical feasibility, team capability, data availability, user behavior, performance characteristics.
+
+2. **For each assumption, run the Recursive Why:**
+   ```
+   Assumption: "We need real-time updates"
+   → Why? "Because users expect instant feedback"
+   → Why do they expect that? "Because... actually, we haven't validated this. A 5-second poll might be fine."
+   → STOP: Hit "I don't know" — this is an unverified assumption.
+   ```
+
+3. **Classify what you find:**
+   - **Bedrock** (verified, backed by evidence or hard constraint) → proceed with confidence
+   - **Unverified** (believed but not proven) → flag to the user, ask whether to proceed, investigate, or mitigate
+   - **Weak** (rests on habit or "that's how we do it") → challenge directly: "Is there a reason, or is this inertia?"
+
+4. **Surface to the user** before moving to Phase 4:
+   ```
+   Assumption audit for [chosen approach]:
+   ✓ Bedrock: PostgreSQL can handle the query pattern (verified in similar feature X)
+   ? Unverified: Users need real-time updates (no data — assumed)
+   ✗ Weak: "We always use WebSockets for this" (habit, not requirement)
+   ```
+
+5. **Use AskUserQuestion** if any unverified or weak assumptions are found:
+   - question: "Found [N] unverified assumptions. How do you want to handle them?"
+   - options: "Proceed anyway (accept the risk)", "Investigate before committing", "Reconsider approach"
+
+**Depth:** 2-3 levels of "why" per assumption. Stop at bedrock, not at a fixed number.
+
+See `../../super-intelligence/knowledge/socratic-patterns.md` for evidence grounding and `discovery-patterns.md` → "Recursive Why" for the loop technique.
+
 ---
 
 ## Phase 4: Capture Decisions
@@ -242,6 +279,8 @@ Before delivering the brainstorm document, verify:
 
 - [ ] Problem was reframed — not just accepted at face value
 - [ ] At least 2 approaches were explored with tradeoffs
+- [ ] Assumption Audit ran on the chosen approach — assumptions classified as bedrock/unverified/weak
+- [ ] No unverified or weak assumptions were silently accepted — user was asked about each
 - [ ] Every decision has rationale and rejected alternatives documented
 - [ ] Open questions are listed — nothing swept under the rug
 - [ ] `/plan` can start from this document without asking "but what did you decide about X?"

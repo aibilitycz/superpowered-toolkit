@@ -54,6 +54,8 @@ Use these patterns to surface gaps. The best questions are specific, evidence-se
 - "What would need to be true for this approach to fail?"
 - "This assumes [X]. Has that been verified, or are we taking it on faith?"
 
+For deep assumption testing, use the **Recursive Why loop** — each answer becomes the next question's input until you hit bedrock or "I don't know." See `../../super-perception/knowledge/discovery-patterns.md` → "Recursive Why" for the full technique. This loop is mandatory in `/brainstorm` (Phase 3 Assumption Audit) and `/plan` (Phase 4 for standard+ plans).
+
 ### Contradiction Surfacing
 
 - "This conflicts with the decision in [specific brainstorm/plan]. Has the context changed, or is this an oversight?"

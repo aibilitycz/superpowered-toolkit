@@ -106,15 +106,56 @@ How does the wider ecosystem solve this?
 
 Noticing what others miss. Not a mystical ability — a set of deliberate practices.
 
-### Ask Why Three Times
+### Recursive Why (The Loop)
 
-When you encounter a decision, bug, or pattern, ask "why" three times to get past the surface:
+The most powerful signal detection technique. Each answer becomes the input to the next "why." You loop until you hit bedrock — a foundational constraint, a deliberate decision with clear rationale, or "I don't know" (which is the most valuable finding of all).
+
+**The mechanism:**
+
+```
+Start: "Why are we choosing [approach]?"
+  → Answer becomes the next question's input
+    → Answer becomes the next question's input
+      → Continue until: bedrock, deliberate decision, or "I don't know"
+```
+
+**Example — debugging (deep, 5 levels):**
 
 1. "Why do we batch notifications?" → "Because individual sends are slow."
 2. "Why are individual sends slow?" → "Because each send hits a rate-limited API."
 3. "Why do we hit a rate-limited API?" → "Because we're using the legacy notification provider."
+4. "Why are we using the legacy provider?" → "Because nobody's evaluated alternatives."
+5. "Why hasn't anyone evaluated alternatives?" → "Because we assumed the current one was fine."
 
-The third "why" often reveals the real problem — not what you'd fix by looking at the surface.
+→ **Bedrock:** An untested assumption. The real fix isn't batching — it's evaluating providers.
+
+**Example — approach selection (lighter, 2-3 levels):**
+
+1. "Why WebSockets instead of SSE?" → "Because we need bidirectional communication."
+2. "Why do we need bidirectional?" → "For typing indicators and read receipts."
+3. "Why not handle those separately?" → "...actually, SSE + REST POST would be simpler."
+
+→ **Bedrock:** The bidirectionality requirement was assumed, not real.
+
+**How deep to go:**
+
+| Context | Depth | Why |
+|---------|-------|-----|
+| Approach selection in brainstorm | 2-3 levels | Enough to surface untested assumptions without analysis paralysis |
+| Root cause analysis (debugging) | 4-5 levels | Need to reach the systemic cause, not just the proximate one |
+| Risk assessment in planning | 2-3 levels | Surface what the risk actually depends on |
+
+**Stop conditions — the loop ends when you reach:**
+
+- **Physics/business constraint:** "Because GDPR requires it" — that's bedrock, stop digging.
+- **Deliberate, documented decision:** "Because ADR-007 decided this with clear rationale" — bedrock.
+- **"I don't know":** The most valuable outcome. An unverified assumption is now visible. Surface it.
+- **Circular reasoning:** You're getting the same answer rephrased. The real answer is "I don't know" — surface that.
+
+**Anti-patterns:**
+- Don't force exactly 5 levels. Stop at bedrock, whether that's level 2 or level 5.
+- Don't use this on trivial decisions. "Why tabs vs. spaces?" doesn't need recursive questioning.
+- Don't confuse this with interrogation. The tone is curious, not adversarial.
 
 ### Anomaly Awareness
 

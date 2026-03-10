@@ -180,16 +180,58 @@ confidence: high | medium | low
 
 **Standard and detailed plans also include:**
 6. **Decision Rationale** — Why this approach? Alternatives considered? Tradeoffs?
-7. **Risk Analysis** — What could go wrong? How do we mitigate it?
+7. **Assumptions** — What must be true for this plan to work? (see Assumption Audit below)
+8. **Risk Analysis** — What could go wrong? How do we mitigate it?
 
 **Detailed plans also include:**
-8. **Phased Implementation** — Phases with exit criteria per phase
-9. **References** — Links to brainstorm, relevant code, past solutions
+9. **Phased Implementation** — Phases with exit criteria per phase
+10. **References** — Links to brainstorm, relevant code, past solutions
 
 **Confidence calibration (stated in frontmatter and body):**
 - **High:** Clear requirements + existing codebase patterns + bounded scope
 - **Medium:** Requirements understood but approach is new territory
 - **Low:** Unclear requirements, ambiguous scope, significant unknowns — flag these and suggest `/brainstorm` first
+
+### Assumption Audit (standard and detailed plans)
+
+Before finalizing, identify the assumptions the plan depends on and run the Recursive Why loop on each.
+
+**Process:**
+
+1. **Extract assumptions** from the proposed solution and task list. Look for:
+   - Technical assumptions ("this API supports X", "the database can handle Y")
+   - Data assumptions ("users will provide Z", "this field is always populated")
+   - Organizational assumptions ("team X will review this", "we have access to Y")
+   - Dependency assumptions ("library X works with our stack", "service Y is stable")
+
+2. **For each assumption, ask "Why do we believe this?" → loop the answer:**
+   ```
+   Assumption: "The scoring engine can handle async batch processing"
+   → Why? "Because it's stateless"
+   → Why does statelessness guarantee batch support? "Because... it doesn't. We'd need to verify queue handling."
+   → STOP: Unverified.
+   ```
+
+3. **Write the Assumptions section in the plan:**
+   ```markdown
+   ## Assumptions
+
+   | Assumption | Status | Evidence |
+   |------------|--------|----------|
+   | PostgreSQL handles 10k concurrent reads | Verified | Load test from Q1 (docs/solutions/perf/db-load-test.md) |
+   | Users provide email during onboarding | Verified | Required field in registration flow |
+   | Scoring engine supports async batch | Unverified | Needs investigation before Phase 2 |
+   | Feature flag service handles gradual rollout | Verified | Used in 3 prior features (flagd config) |
+   ```
+
+4. **Unverified assumptions** automatically become either:
+   - A task in the implementation plan ("Verify: scoring engine async support")
+   - An explicit risk in the Risk Analysis section
+   - An open question that blocks a specific phase
+
+**Depth:** 2-3 levels per assumption. If the brainstorm already ran an Assumption Audit, inherit its findings — don't repeat the work, just verify nothing changed.
+
+See `../../super-perception/knowledge/discovery-patterns.md` → "Recursive Why" for the loop technique.
 
 **Exit:** Plan document written.
 
@@ -226,6 +268,8 @@ Before delivering the plan, verify:
 - [ ] Tasks are dependency-ordered — not a flat, unordered list
 - [ ] Acceptance criteria are measurable — "users can do X" not "the system is good"
 - [ ] Decision rationale explains WHY, not just WHAT (for standard+ plans)
+- [ ] Assumptions are surfaced with status (verified/unverified) — for standard+ plans
+- [ ] Unverified assumptions are either investigation tasks or explicit risks — nothing swept under the rug
 - [ ] Someone new could start `/work` from this plan without clarifying questions
 - [ ] Confidence level is stated and honest
 - [ ] No code was written — only the plan document was created
