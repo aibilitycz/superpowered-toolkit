@@ -76,6 +76,18 @@ Is this a hard decision with multiple valid options?
 └─ No → Just decide and move
 ```
 
+### When to /cto (vs. /think)
+
+```
+Is this a leadership, org, or strategy challenge (not a code problem)?
+├─ Yes → Do you need a shareable artifact (strategy doc, decision map, assessment)?
+│  ├─ Yes → /cto — structured advisory with artifact output
+│  └─ No → Is it a decision between technical options?
+│     ├─ Yes → /think — expert panel or tradeoff matrix
+│     └─ No → /cto — open-ended advisory via cto-advisor agent
+└─ No → Use /review, /investigate, or /think for code-level problems
+```
+
 ## Skills
 
 | Skill | Command | Purpose |
@@ -84,6 +96,7 @@ Is this a hard decision with multiple valid options?
 | [Review](skills/review/SKILL.md) | `/review` | Focused review of code, documents, or architecture — auto-detects scope, one deep pass |
 | [Think](skills/think/SKILL.md) | `/think` | Deep reasoning — expert panels, devil's advocate, what-if scenarios, tradeoff analysis |
 | [Investigate](skills/investigate/SKILL.md) | `/investigate` | Detective-style investigation — follows evidence trails with Sherlock/Poirot/Columbo lenses |
+| [CTO](skills/cto/SKILL.md) | `/cto` | Strategic CTO advisor — strategy docs, org assessment, decision maps, board prep, AI audits |
 
 ## Agents
 
@@ -96,6 +109,7 @@ Is this a hard decision with multiple valid options?
 | [Security Reviewer](agents/security-reviewer.md) | sonnet | Deep security review — OWASP, auth, secrets, adversarial threat modeling |
 | [Infra Reviewer](agents/infra-reviewer.md) | sonnet | Infrastructure review — Terraform, Helm, K8s, Docker, CI/CD |
 | [Performance Reviewer](agents/performance-reviewer.md) | sonnet | Performance review — N+1 queries, complexity, memory, scaling |
+| [CTO Advisor](agents/cto-advisor.md) | sonnet | Strategic CTO advisor — applies CTO canon and AI-era frameworks to leadership challenges |
 
 ## Knowledge
 
@@ -110,6 +124,12 @@ Is this a hard decision with multiple valid options?
 | [TypeScript & Next.js](knowledge/typescript-nextjs-patterns.md) | Next.js 15, React 19, RTK Query, Effect-TS, Drizzle ORM, strict TypeScript |
 | [Observability](knowledge/observability.md) | PromQL, LogQL, Grafana dashboards, alerting rules, SLO/SLI patterns |
 | [Socratic Patterns](knowledge/socratic-patterns.md) | Evidence-based challenging — CoVe technique, question templates, calibration |
+| [CTO Canon](knowledge/cto-canon.md) | CTO thought leaders — Larson, Fournier, Majors, DHH, Fowler, Cagan, Team Topologies, DORA |
+| [CTO Operating Modes](knowledge/cto-operating-modes.md) | 7 CTO modes with decision trees, anti-patterns, AI-era twists, mode routing table |
+| [CTO AI Era](knowledge/cto-ai-era.md) | AI-specific CTO challenges — assistants, smaller teams, build/buy/generate, strategy half-life |
+| [CTO Org Design](knowledge/cto-org-design.md) | Team Topologies, staffing, hiring, CTO transitions, co-founder dynamics, decision rights |
+| [CTO Stakeholder](knowledge/cto-stakeholder.md) | Translation frameworks, templates — pivot cost, strategy doc, board prep, incident comms |
+| [CTO Metrics](knowledge/cto-metrics.md) | DORA metrics by stage, team health, pivot cost calculator, AI adoption metrics, glue work |
 
 ## Disclaimer
 
