@@ -75,10 +75,15 @@ Your senior CTO advisor. Structured workflows for the 7 operating modes, each pr
 **If invoked without a sub-command** (e.g., `/cto` or `/cto [description of problem]`):
 - Read the mode routing table from `knowledge/cto-operating-modes.md`
 - Identify which mode(s) the user's challenge falls into
-- **Disambiguation questions** (ask when routing is ambiguous):
-  - Mode 1 vs. Mode 7: "Is this about the technical cost of changing direction, or about nobody owning product direction?" (Mode 1 → `/cto strategy`, Mode 7 → `/cto decision-map`)
-  - Mode 2 vs. Mode 4: "Is this a people/structure problem, or a workflow/process problem?" (Mode 2 → `/cto org`, Mode 4 → general advisory)
-- Use **AskUserQuestion** to confirm and route
+- Use **AskUserQuestion** to confirm routing:
+  - question: "Based on what you've described, which area do you want to work on?"
+  - header: "CTO mode"
+  - options: [relevant sub-commands based on detected mode, with descriptions]
+  - multiSelect: false
+
+- **Disambiguation questions** (use AskUserQuestion when routing is ambiguous):
+  - Mode 1 vs. Mode 7: question: "Is this about the technical cost of changing direction, or about nobody owning product direction?", options: ["Technical cost → /cto strategy", "Ownership gap → /cto decision-map"]
+  - Mode 2 vs. Mode 4: question: "Is this a people/structure problem, or a workflow/process problem?", options: ["People/structure → /cto org", "Workflow/process → open advisory"]
 
 **Sub-command overview:**
 
@@ -101,13 +106,14 @@ Your senior CTO advisor. Structured workflows for the 7 operating modes, each pr
 ### Phase 1: Understand the Situation
 **Entry:** User invoked `/cto strategy` (or routed here from Phase 0).
 
-Use **AskUserQuestion** to gather:
-1. What's the current technical direction? (Or is there no clear one?)
-2. Is a direction change being discussed? If so, from what to what?
-3. How long has the team been working on the current direction, and how many engineers?
-4. What's driving the need for this document? (Pivot proposal? Board meeting? Alignment?)
-5. What are the constraints? (Team size, budget, timeline, existing commitments)
-6. Who's the audience? (Co-founders? Board? Engineering team?)
+Use **AskUserQuestion** to gather context. Ask 1-4 questions per call, structured with headers and options where natural choices exist. Example first question:
+
+- question: "What's driving the need for a strategy document right now?"
+- header: "Trigger"
+- options: ["Pivot being discussed" (a direction change is on the table), "Alignment needed" (team isn't on the same page), "Board/investor prep" (need to present technical direction), "New CTO/role" (defining direction from scratch)]
+- multiSelect: false
+
+Follow up based on answer to gather: current direction, proposed change (if any), team size & duration on current direction, constraints, and audience. Use free-text questions (via the automatic "Other" option) for context that doesn't fit structured choices.
 
 **Exit:** Situation understood. Enough context to apply frameworks and produce an artifact.
 
@@ -148,13 +154,14 @@ If a pivot was analyzed, include the Pivot Cost Estimate as an appendix with the
 ### Phase 1: Understand the Team
 **Entry:** User invoked `/cto org` (or routed here from Phase 0).
 
-Use **AskUserQuestion** to gather:
-1. Team size and structure (who reports to whom)?
-2. What's working? What's not?
-3. Is the CTO doing both coding and strategy? Where is time actually going?
-4. Any signals: people leaving, burnout, missed deadlines, quality issues?
-5. How does work flow? (Process, tools, deployment cadence)
-6. Are DORA metrics tracked? If so, current numbers?
+Use **AskUserQuestion** to gather context. Start with:
+
+- question: "What's the main concern about your team right now?"
+- header: "Team concern"
+- options: ["We need to hire" (capacity or skill gap), "Team structure isn't working" (roles unclear, silos, dependencies), "CTO is doing too much" (coding + leading + everything), "People are struggling" (burnout, attrition, morale)]
+- multiSelect: true
+
+Follow up to gather: team size & structure, what's working, CTO time split, warning signals, process maturity, and DORA metrics (if tracked).
 
 **Exit:** Team situation understood. Enough data to assess.
 
@@ -218,11 +225,14 @@ If a hiring need was identified, append a Hiring Proposal:
 ### Phase 1: Understand the Leadership Team
 **Entry:** User invoked `/cto decision-map` (or routed here from Phase 0).
 
-Use **AskUserQuestion** to gather:
-1. Who's on the leadership team? Titles and actual functions?
-2. Where do decisions get stuck or re-litigated?
-3. Are there decisions nobody owns? Decisions everyone thinks they own?
-4. How are decisions currently made? (Consensus? Loudest voice? Default to founder?)
+Use **AskUserQuestion** to gather context. Start with:
+
+- question: "How are decisions currently made in your leadership team?"
+- header: "Decision style"
+- options: ["Consensus (or try to)" (everyone needs to agree, which means nobody decides), "Founder decides" (one person calls all the shots), "Loudest voice wins" (whoever pushes hardest gets their way), "Nobody decides" (decisions just... happen or don't)]
+- multiSelect: false
+
+Follow up to gather: who's on the leadership team (titles vs. actual functions), where decisions get stuck or re-litigated, and what decisions nobody owns vs. everyone thinks they own.
 
 **Exit:** Leadership dynamics understood. Enough context to map.
 
@@ -256,11 +266,14 @@ Write a Decision Rights Map using the template from `knowledge/cto-stakeholder.m
 ### Phase 1: Understand the Context
 **Entry:** User invoked `/cto board-prep` (or routed here from Phase 0).
 
-Use **AskUserQuestion** to gather:
-1. Who's the audience? (Board? Investors? Non-technical co-founders?)
-2. What's the key message? (Technical investment? Risk? Opportunity? Incident report?)
-3. What metrics are available?
-4. What decisions need to be made by the audience?
+Use **AskUserQuestion** to gather context:
+
+- question: "What's the key message you need to communicate?"
+- header: "Message type"
+- options: ["Technical investment" (need budget/time for infrastructure, tooling, hiring), "Risk communication" (something is at risk and stakeholders need to know), "Progress update" (what we built, what it means for the business), "Incident/post-mortem" (something broke, here's what happened and what changes)]
+- multiSelect: false
+
+Follow up to gather: audience (board, investors, non-technical leadership), available metrics, and what decisions the audience needs to make.
 
 **Exit:** Audience, message, and available data understood.
 
@@ -300,12 +313,14 @@ Write a Board Presentation Outline:
 ### Phase 1: Understand Current State
 **Entry:** User invoked `/cto ai-audit` (or routed here from Phase 0).
 
-Use **AskUserQuestion** to gather:
-1. What AI tools does the team use? (Coding assistants, AI-generated code, internal AI features?)
-2. Who uses them most? Who doesn't? (Seniority pattern?)
-3. What's the monthly AI/token spend?
-4. Is there test infrastructure that validates AI output?
-5. How does code review handle AI-generated code?
+Use **AskUserQuestion** to gather context:
+
+- question: "Where is your team with AI tool adoption?"
+- header: "AI maturity"
+- options: ["Early" (some engineers experimenting individually), "Adopted" (team has standard tools, most people use them), "Integrated" (AI agents in workflows, token costs tracked), "Unsure" (don't have visibility into how the team uses AI)]
+- multiSelect: false
+
+Follow up to gather: specific tools in use, who uses them (seniority pattern), monthly token spend, test infrastructure for AI output validation, and how code review handles AI-generated code.
 
 **Exit:** Current AI state understood. Enough data to assess.
 
